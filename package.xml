@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<package>
+	<name>archive</name>
+	<summary>archive extension</summary>
+	<description>
+		archive extension allows to read (and probably write in the future)
+		tar and cpio archives using libarchive (http://people.freebsd.org/~kientzle/libarchive/).
+    </description>
+    <license>PHP License</license>
+    <maintainers>
+        <maintainer>
+			<user>tony2001</user>
+			<name>Antony Dovgal</name>
+			<email>antony@zend.com</email>
+        </maintainer>
+	</maintainers>
+	<release>
+		<version>0.1</version>
+		<date>2005-01-26</date>
+		<state>alpha</state>
+		<notes>
+			Initial release.
+		</notes>
+	</release>
+	<filelist>
+        <dir role="src" name="/">
+			<file role="doc">CREDITS</file>
+			<file role="doc">API.txt</file>
+			<file role="src">config.m4</file>
+			<file role="src">archive.c</file>
+			<file role="src">archive_reader.c</file>
+			<file role="src">archive_entry.c</file>
+			<file role="src">archive_writer.c</file>
+			<file role="src">archive_clbk.c</file>
+			<file role="src">php_archive.h</file>
+			<file role="src">archive_reader.h</file>
+			<file role="src">archive_writer.h</file>
+			<file role="src">php_archive_entry.h</file>
+			<file role="src">archive_clbk.h</file>
+			<file role="test">tests/unlink_entry.inc</file>
+			<file role="test">tests/_files/bsdtar.cpio</file>
+			<file role="test">tests/_files/bsdtar.cpio.bz2</file>
+			<file role="test">tests/_files/bsdtar.cpio.gz</file>
+			<file role="test">tests/_files/bsdtar.tar</file>
+			<file role="test">tests/_files/bsdtar.tar.bz2</file>
+			<file role="test">tests/_files/bsdtar.tar.gz</file>
+			<file role="test">tests/_files/extracting-unwritable-dirs.tar</file>
+			<file role="test">tests/_files/extracting-unwritable-dirs.tar.bz2</file>
+			<file role="test">tests/_files/extracting-unwritable-dirs.tar.gz</file>
+			<file role="test">tests/_files/gnucpio.cpio</file>
+			<file role="test">tests/_files/gnucpio.cpio.bz2</file>
+			<file role="test">tests/_files/gnucpio.cpio.gz</file>
+			<file role="test">tests/_files/gnutar.tar</file>
+			<file role="test">tests/_files/gnutar.tar.bz2</file>
+			<file role="test">tests/_files/gnutar.tar.gz</file>
+			<file role="test">tests/_files/mkdir-torture.tar</file>
+			<file role="test">tests/_files/mkdir-torture.tar.bz2</file>
+			<file role="test">tests/_files/mkdir-torture.tar.gz</file>
+			<file role="test">tests/_files/try-to-extract-with-umask-777.tar</file>
+			<file role="test">tests/_files/try-to-extract-with-umask-777.tar.bz2</file>
+			<file role="test">tests/_files/try-to-extract-with-umask-777.tar.gz</file>
+			<file role="test">tests/list/001.phpt</file>
+			<file role="test">tests/list/002.phpt</file>
+			<file role="test">tests/list/003.phpt</file>
+			<file role="test">tests/list/004.phpt</file>
+			<file role="test">tests/list/005.phpt</file>
+			<file role="test">tests/list/006.phpt</file>
+			<file role="test">tests/list_gz/001.phpt</file>
+			<file role="test">tests/list_gz/002.phpt</file>
+			<file role="test">tests/list_gz/003.phpt</file>
+			<file role="test">tests/list_gz/004.phpt</file>
+			<file role="test">tests/list_gz/005.phpt</file>
+			<file role="test">tests/list_gz/006.phpt</file>
+			<file role="test">tests/list_bz2/001.phpt</file>
+			<file role="test">tests/list_bz2/002.phpt</file>
+			<file role="test">tests/list_bz2/003.phpt</file>
+			<file role="test">tests/list_bz2/004.phpt</file>
+			<file role="test">tests/list_bz2/005.phpt</file>
+			<file role="test">tests/list_bz2/006.phpt</file>
+			<file role="test">tests/extract/001.phpt</file>
+			<file role="test">tests/extract/002.phpt</file>
+			<file role="test">tests/extract/003.phpt</file>
+			<file role="test">tests/extract/004.phpt</file>
+			<file role="test">tests/extract/005.phpt</file>
+			<file role="test">tests/extract/006.phpt</file>
+			<file role="test">tests/extract_gz/001.phpt</file>
+			<file role="test">tests/extract_gz/002.phpt</file>
+			<file role="test">tests/extract_gz/003.phpt</file>
+			<file role="test">tests/extract_gz/004.phpt</file>
+			<file role="test">tests/extract_gz/005.phpt</file>
+			<file role="test">tests/extract_gz/006.phpt</file>
+			<file role="test">tests/extract_bz2/001.phpt</file>
+			<file role="test">tests/extract_bz2/002.phpt</file>
+			<file role="test">tests/extract_bz2/003.phpt</file>
+			<file role="test">tests/extract_bz2/004.phpt</file>
+			<file role="test">tests/extract_bz2/005.phpt</file>
+			<file role="test">tests/extract_bz2/006.phpt</file>
+         </dir>
+	</filelist>
+</package>
