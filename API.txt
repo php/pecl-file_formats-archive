@@ -1,0 +1,170 @@
+Archive extension API
+
+Constants:
+	ARCH_FORMAT_TAR
+	ARCH_FORMAT_CPIO
+	ARCH_FORMAT_PAX
+	ARCH_FORMAT_PAX_RESTRICTED
+	ARCH_FORMAT_SHAR
+	ARCH_FORMAT_USTAR
+
+	ARCH_COMPRESSION_GZIP (defined only if PHP was compiled --with--zlib)
+	ARCH_COMPRESSION_BZIP2 (defined only if PHP was compiled --with--bz2)
+	ARCH_COMPRESSION_COMPRESS
+	ARCH_COMPRESSION_NONE
+
+Classes:
+
+class ArchiveReader {
+	/** 
+	* ArchiveReader __construct (string filename[, int format[, int compression]])
+	* 
+	* You need to specify format & compression params *only* if you need 
+	* to support only these particular formats/compressions.
+	* Use ARCH_COMPRESSION_GZIP | ARCH_COMPRESSION_BZIP2 to support bz2 & gz and
+	* ARCH_FORMAT_TAR | ARCH_FORMAT_CPIO to support standard tar & cpio.
+	* All possible formats and compressions are supported by default.
+	* You'll need libbz2 or libz linked, though, to support BZIP2 or GZIP 
+	* appropriately.
+	*/
+	public function __construct($filename, $format, $compression);
+	
+	/** 
+	* ArchiveEntry getNextEntry ([bool fetch_entry_data])
+	* 
+	* Fetch next ArchiveEntry from the archive.
+	* 
+	* Parameter fetch_entry_data is used to specify explicitly
+	* that you need to fetch entry's data. 
+	* 
+	* There is pretty annoying libarchive limitation:
+	* you can't fetch entry's data twice, so call to extractCurrentEntry()
+	* after getNextEntry(true) will return false, as there is no data available.
+	* 
+	* You can also get entry's data with ArchiveEntry->getData() if 
+	* fetch_entry_data was TRUE.
+	*/
+	public function getNextEntry($fetch_entry_data);
+	
+	/** 	 
+	* string getCurrentEntryData(void)
+	* 
+ 	* Fetches current entry's data.
+	* 
+	* You can also get it with ArchiveEntry->getData() after that.
+	*/
+	public function getCurrentEntryData();
+	
+	/** 
+	* bool extractCurrentEntry(void)
+	* 
+	* Recreate entry on your local disk.
+	* The path is RELATIVE to current script.
+	*/
+	public function extractCurrentEntry();
+	
+	/** 
+	* bool close(void)
+	* 
+	* Close handle.
+	*/
+	public function close();
+}
+
+class ArchiveEntry {
+	/**
+	* ArchiveEntry __construct(string filename)
+	* 
+	* Should be probably disabled while ArchiveWriter is not ready 
+	*/
+	public function __construct(); 
+	
+	/**
+	* bool isDir(void)
+	*/
+	public function isDir(); 
+	
+	/**
+	* bool isFile(void)
+	*/
+	public function isFile(); 
+	
+	/**
+	* bool isLink(void)
+	*/
+	public function isLink(); 
+	
+	/**
+	* string getPathname(void)
+	* 
+	* Return full entry name.
+	*/
+	public function getPathname(); 
+	
+	/**
+	* string getResolvedPathname(void)
+	* 
+	* Return full resolved name of a symlink.
+	*/
+	public function getResolvedPathname(); 
+	
+	/**
+	* string getUser(void)
+	* 
+	* Entry's owner name.
+	* (not supported in CPIO archives)
+	*/
+	public function getUser(); 
+	
+	/**
+	* string getGroup(void)
+	* 
+	* Entry's owner group name.
+	* (not supported in CPIO archives)
+	*/
+	public function getGroup(); 
+	
+	/**
+	* int getMtime(void)
+	* 
+	* Entry's last modification time.
+	* atime & ctime are not supported by libarchive.
+	*/
+	public function getMtime(); 
+	
+	/**
+	* int getSize(void)
+	* 
+	* Return entry's size in bytes.
+	*/
+	public function getSize(); 
+	
+	/**
+	* int getPerms(void)
+	* 
+	* Similar to fileperms().
+	*/
+	public function getPerms(); 
+
+	/**
+	* string getData(void) 
+	* 
+	* Return entry's data (*only* if it was fetched before by
+	* getNextEntry(true) or getCurrentEntryData() !)
+	*/
+	public function getData(); 
+}
+
+class ArchiveException extends Exception {
+/* methods inherited from Exception */
+}
+
+/* tell me why would someone need it */
+interface ArchiveReader {
+	public function __construct($filename, $format, $compression);	
+	public function getNextEntry($fetch_entry_data);
+	public function getCurrentEntryData();
+	public function extractCurrentEntry();
+	public function close();
+}
+
