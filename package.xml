@@ -97,4 +97,7 @@
 			<file role="test">tests/extract_bz2/006.phpt</file>
          </dir>
 	</filelist>
+	<deps>
+		<dep type="php" rel="ge" version="5.0.0"/>
+	</deps>
 </package>
