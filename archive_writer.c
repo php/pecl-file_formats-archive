@@ -111,11 +111,11 @@ ZEND_METHOD(ArchiveWriter, __construct)
 	switch (compression) {
 #ifdef HAVE_ZLIB
 		case 0:
-		case PHP_ARCHIVE_GZIP:
+		case PHP_ARCHIVE_COMPRESSION_GZIP:
 			archive_write_set_compression_gzip(arch->arch);
 			break;
 #else
-		case PHP_ARCHIVE_GZIP:
+		case PHP_ARCHIVE_COMPRESSION_GZIP:
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Gzip compression is not supported in this build");
 			php_set_error_handling(EH_NORMAL, NULL TSRMLS_CC);
 			return;
@@ -123,17 +123,21 @@ ZEND_METHOD(ArchiveWriter, __construct)
 #endif
 
 #ifdef HAVE_BZ2
-		case PHP_ARCHIVE_BZIP2:
+		case PHP_ARCHIVE_COMPRESSION_BZIP2:
 			archive_write_set_compression_gzip(arch->arch);
 			break;
 #else
-		case PHP_ARCHIVE_BZIP2:
+		case PHP_ARCHIVE_COMPRESSION_BZIP2:
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Bzip2 compression is not supported in this build");
 			php_set_error_handling(EH_NORMAL, NULL TSRMLS_CC);
 			return;
 			break; 
 #endif
-		case 0:
+		case PHP_ARCHIVE_COMPRESSION_NONE:
+			/* always supported */
+			break;
+		case PHP_ARCHIVE_COMPRESSION_COMPRESS:
+			/* always supported */
 			break;
 		default:
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unsupported compression type %d", compression);
