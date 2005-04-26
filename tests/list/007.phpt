@@ -175,7 +175,7 @@ int(1053769444)
 int(12890)
 int(32768)
 string(12890) "*******************************************************************************
-  File:     @(#)$Id$
+  File:     @(#)%s
   Contents: How to report bugs and hardware compatibility for pcl3
   Author:   Martin Lottermoser, Greifswaldstrasse 28, 38124 Braunschweig,
             Germany. E-mail: Martin.Lottermoser@t-online.de.

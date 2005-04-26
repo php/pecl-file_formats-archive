@@ -29,7 +29,7 @@ echo "Done\n";
 
 ?>
 --EXPECTF--
-object(ArchiveException)#%d (7) {
+object(ArchiveException)#%d (6) {
   ["message:protected"]=>
   string(88) "ArchiveReader::__construct(nonex.file): failed to open stream: No such file or directory"
   ["string:private"]=>
@@ -41,12 +41,28 @@ object(ArchiveException)#%d (7) {
   ["line:protected"]=>
   int(%d)
   ["trace:private"]=>
-  array(0) {
+  array(1) {
+    [0]=>
+    array(6) {
+      ["file"]=>
+      string(%d) "%s001.php"
+      ["line"]=>
+      int(%d)
+      ["function"]=>
+      string(11) "__construct"
+      ["class"]=>
+      string(13) "ArchiveReader"
+      ["type"]=>
+      string(2) "->"
+      ["args"]=>
+      array(1) {
+        [0]=>
+        string(10) "nonex.file"
+      }
+    }
   }
-  ["severity"]=>
-  int(2)
 }
-object(ArchiveException)#%d (7) {
+object(ArchiveException)#%d (6) {
   ["message:protected"]=>
   string(143) "ArchiveReader::__construct(): Failed to open file . for reading: error #84, Empty input file: Invalid or incomplete multibyte or wide character"
   ["string:private"]=>
@@ -58,10 +74,26 @@ object(ArchiveException)#%d (7) {
   ["line:protected"]=>
   int(%d)
   ["trace:private"]=>
-  array(0) {
+  array(1) {
+    [0]=>
+    array(6) {
+      ["file"]=>
+      string(%d) "%s001.php"
+      ["line"]=>
+      int(%d)
+      ["function"]=>
+      string(11) "__construct"
+      ["class"]=>
+      string(13) "ArchiveReader"
+      ["type"]=>
+      string(2) "->"
+      ["args"]=>
+      array(1) {
+        [0]=>
+        string(1) "."
+      }
+    }
   }
-  ["severity"]=>
-  int(2)
 }
 object(ArchiveReader)#%d (1) {
   ["fd"]=>
