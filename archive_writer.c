@@ -136,9 +136,6 @@ ZEND_METHOD(ArchiveWriter, __construct)
 		case PHP_ARCHIVE_COMPRESSION_NONE:
 			/* always supported */
 			break;
-		case PHP_ARCHIVE_COMPRESSION_COMPRESS:
-			/* always supported */
-			break;
 		default:
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unsupported compression type %d", compression);
 			php_set_error_handling(EH_NORMAL, NULL TSRMLS_CC);
@@ -154,7 +151,7 @@ ZEND_METHOD(ArchiveWriter, __construct)
 		switch (format) {
 			case PHP_ARCHIVE_FORMAT_TAR:
 			case PHP_ARCHIVE_FORMAT_PAX_RESTRICTED:
-				archive_write_set_format_ustar(arch->arch);
+				archive_write_set_format_pax_restricted(arch->arch);
 				break;
 			case PHP_ARCHIVE_FORMAT_PAX:
 				archive_write_set_format_pax(arch->arch);
@@ -255,7 +252,7 @@ ZEND_METHOD(ArchiveWriter, addEntry)
 					archive_write_header(arch->arch, entry->entry);
 					header_written = 1;
 				}
-				
+					
 				result = archive_write_data(arch->arch, buf, read_bytes);
 				
 				if (result <=0) {
