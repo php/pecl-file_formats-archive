@@ -1,5 +1,9 @@
 --TEST--
 basic ArchiveWriter tests
+--SKIPIF--
+<?php
+    if (!extension_loaded("archive")) print "skip";
+?>
 --FILE--
 <?php
 

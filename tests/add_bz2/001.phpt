@@ -1,5 +1,10 @@
 --TEST--
 basic ArchiveWriter tests
+--SKIPIF--
+<?php
+        if (!extension_loaded("archive")) print "skip";
+        if (!defined('ARCH_COMPRESSION_BZIP2')) print "skip bzip2 compression in not supported";
+?>
 --FILE--
 <?php
 

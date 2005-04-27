@@ -1,5 +1,9 @@
 --TEST--
 adding same file multiple times 
+--SKIPIF--
+<?php
+    if (!extension_loaded("archive")) print "skip";
+?>
 --FILE--
 <?php
 

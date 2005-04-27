@@ -1,5 +1,9 @@
 --TEST--
 adding same files before the directory 
+--SKIPIF--
+<?php
+    if (!extension_loaded("archive")) print "skip";
+?>
 --FILE--
 <?php
 
