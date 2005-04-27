@@ -33,6 +33,8 @@ ssize_t _archive_read_clbk(struct archive *a, void *client_data, const void **bu
 	archive_file_t *arch = (archive_file_t *)client_data;
 	ssize_t len = 0;
 
+	TSRMLS_FETCH();
+
 	if (arch->stream == NULL) {
 		return 0;
 	}
@@ -52,6 +54,8 @@ ssize_t _archive_write_clbk(struct archive *a, void *client_data, void *buff, si
 	archive_file_t *arch = (archive_file_t *)client_data;
 	ssize_t len;
 	
+	TSRMLS_FETCH();
+	
 	if (arch->stream == NULL) {
 		return 0;
 	}
@@ -69,6 +73,8 @@ int _archive_open_clbk(struct archive *a, void *client_data)
 {
 	archive_file_t *arch = (archive_file_t *)client_data;
 	
+	TSRMLS_FETCH();
+
 	if (arch->mode == PHP_ARCHIVE_WRITE_MODE) {
 		arch->stream = php_stream_open_wrapper_ex(arch->filename, "w", ENFORCE_SAFE_MODE | REPORT_ERRORS, NULL, NULL);
 	} else if (arch->mode == PHP_ARCHIVE_READ_MODE) {
@@ -88,6 +94,8 @@ int _archive_close_clbk(struct archive *a, void *client_data)
 {
 	archive_file_t *arch = (archive_file_t *)client_data;
 	
+	TSRMLS_FETCH();
+
 	if (arch->stream) {
 		php_stream_close(arch->stream);
 	}

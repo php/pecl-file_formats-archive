@@ -70,10 +70,12 @@ static void _archive_desc_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC);
 	
 /* {{{ _archive_entries_hash_dtor
  */
-void _archive_entries_hash_dtor(void *data TSRMLS_DC)
+void _archive_entries_hash_dtor(void *data)
 {
-    archive_entry_t *entry = *(archive_entry_t **)data;
-	_archive_entry_free(entry);
+	archive_entry_t *entry = *(archive_entry_t **)data;
+	TSRMLS_FETCH();
+
+	_archive_entry_free(entry TSRMLS_CC);
 }
 /* }}} */
 
