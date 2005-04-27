@@ -28,9 +28,8 @@
 #include "zend_exceptions.h"
 #include "php_archive.h"
 #include "archive_reader.h"
-#if 0
 #include "archive_writer.h"
-#endif
+#include "archive_util.h"
 #include "archive_clbk.h"
 #include "php_archive_entry.h"
 
@@ -69,6 +68,15 @@ ZEND_GET_MODULE(archive)
 	
 static void _archive_desc_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC);
 	
+/* {{{ _archive_entries_hash_dtor
+ */
+void _archive_entries_hash_dtor(void *data TSRMLS_DC)
+{
+    archive_entry_t *entry = *(archive_entry_t **)data;
+	_archive_entry_free(entry);
+}
+/* }}} */
+
 /* {{{ _archive_desc_dtor
  */
 static void _archive_desc_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC)
@@ -89,6 +97,11 @@ static void _archive_desc_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 	
 	if (arch->filename) {
 		efree(arch->filename);
+	}
+
+	if (arch->entries) {
+		zend_hash_destroy(arch->entries);
+		efree(arch->entries);
 	}
 
 	efree(arch->buf);
@@ -143,9 +156,7 @@ PHP_MINIT_FUNCTION(archive)
 	PHP_MINIT(archive_entry)(INIT_FUNC_ARGS_PASSTHRU);
 	PHP_MINIT(archive_reader)(INIT_FUNC_ARGS_PASSTHRU);
 
-#if 0
 	PHP_MINIT(archive_writer)(INIT_FUNC_ARGS_PASSTHRU);
-#endif
 
 	REGISTER_LONG_CONSTANT("ARCH_FORMAT_TAR", PHP_ARCHIVE_FORMAT_TAR, CONST_CS | CONST_PERSISTENT);
 	REGISTER_LONG_CONSTANT("ARCH_FORMAT_CPIO", PHP_ARCHIVE_FORMAT_CPIO, CONST_CS | CONST_PERSISTENT);

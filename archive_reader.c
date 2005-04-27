@@ -106,6 +106,7 @@ ZEND_METHOD(ArchiveReader, __construct)
 	
 	arch->stream = NULL;
 	arch->current_entry = NULL;
+	arch->entries = NULL;
 	arch->struct_state = ARCHIVE_OK;
 	arch->mode = PHP_ARCHIVE_READ_MODE;
 	arch->buf = emalloc(PHP_ARCHIVE_BUF_LEN + 1);

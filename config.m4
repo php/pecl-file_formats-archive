@@ -41,6 +41,6 @@ if test "$PHP_ARCHIVE" != "no"; then
   PHP_SUBST(ARCHIVE_SHARED_LIBADD)
 
 dnl comment out writer while it's not ready
-dnl  PHP_NEW_EXTENSION(archive, archive.c archive_reader.c archive_writer.c archive_clbk.c archive_entry.c, $ext_shared)
-  PHP_NEW_EXTENSION(archive, archive.c archive_reader.c archive_clbk.c archive_entry.c, $ext_shared)
+  PHP_NEW_EXTENSION(archive, archive.c archive_reader.c archive_writer.c archive_clbk.c archive_entry.c archive_util.c, $ext_shared)
+dnl  PHP_NEW_EXTENSION(archive, archive.c archive_reader.c archive_clbk.c archive_entry.c, $ext_shared)
 fi

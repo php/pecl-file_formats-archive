@@ -18,43 +18,50 @@
 
 /* $Id$ */
 
-#ifndef PHP_ARCHIVE_ENTRY_H
-#define PHP_ARCHIVE_ENTRY_H
-
-#ifndef S_ISDIR
-#define S_ISDIR(mode)	(((mode)&S_IFMT) == S_IFDIR)
-#endif
-#ifndef S_ISREG
-#define S_ISREG(mode)	(((mode)&S_IFMT) == S_IFREG)
-#endif
-#ifndef S_ISLNK
-#define S_ISLNK(mode)	(((mode)&S_IFMT) == S_IFLNK)
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
-zend_class_entry *ce_ArchiveEntry;
+#include "php.h"
+#include "php_archive.h"
+#include "archive_util.h"
 
-ZEND_METHOD(ArchiveEntry, __construct);
-ZEND_METHOD(ArchiveEntry, isDir);
-ZEND_METHOD(ArchiveEntry, isFile);
-ZEND_METHOD(ArchiveEntry, isLink);
-ZEND_METHOD(ArchiveEntry, getPathname);
-ZEND_METHOD(ArchiveEntry, getResolvedPathname);
-ZEND_METHOD(ArchiveEntry, getUser);
-ZEND_METHOD(ArchiveEntry, getGroup);
-ZEND_METHOD(ArchiveEntry, getMtime);
-ZEND_METHOD(ArchiveEntry, getSize);
-ZEND_METHOD(ArchiveEntry, getPerms);
-ZEND_METHOD(ArchiveEntry, getData);
+/* {{{ _archive_normalize_path
+ */
+void _archive_normalize_path(char **pathname, int *pathname_len)
+{
+	while (*pathname_len && (*pathname[0] == '.' || *pathname[0] == '/')) {
+		(*pathname)++;
+		(*pathname_len)--;
+	}
+}
+/* }}} */
 
-PHP_MINIT_FUNCTION(archive_entry);
+/* {{{ _archive_pathname_compare
+ */
+int _archive_pathname_compare(const void *a, const void *b TSRMLS_DC)
+{
+    Bucket *f, *s;
+    zval result, first, second;
 
-int le_archive_entry;
+    f = *((Bucket **) a);
+    s = *((Bucket **) b);
 
-int _archive_get_entry_rsrc_id(zval * TSRMLS_DC);
-int _archive_get_entry_struct(zval *, archive_entry_t ** TSRMLS_DC);
-void _archive_entry_free(archive_entry_t * TSRMLS_DC);
+	Z_TYPE(first) = IS_STRING;
+	Z_STRVAL(first) = f->arKey;
+	Z_STRLEN(first) = f->nKeyLength-1;
 
-#endif /* PHP_ARCHIVE_ENTRY_H */
+	Z_TYPE(second) = IS_STRING;
+	Z_STRVAL(second) = s->arKey;
+	Z_STRLEN(second) = s->nKeyLength-1;
+
+    if (string_compare_function(&result, &first, &second TSRMLS_CC) != SUCCESS) {
+        return 0;
+    }
+    return (Z_LVAL(result) < 0 ? -1 : (Z_LVAL(result) > 0 ? 1 : 0));
+}
+/* }}} */
+
 
 /*
  * Local variables:

@@ -62,7 +62,14 @@ static void _archive_entry_desc_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC);
 static void _archive_entry_desc_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 {
     archive_entry_t *entry = (archive_entry_t *)rsrc->ptr;
-	
+	_archive_entry_free(entry TSRMLS_CC);	
+}
+/* }}} */
+
+/* {{{ _archive_entry_free
+ */
+void _archive_entry_free(archive_entry_t *entry TSRMLS_DC)
+{	
 	if (entry->data) {
 		efree(entry->data);
 	}
@@ -75,6 +82,10 @@ static void _archive_entry_desc_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 		efree(entry->resolved_filename);
 	}
 	
+	if (entry->entry) {
+		archive_entry_free(entry->entry);
+	}
+
 	efree(entry);
 }
 /* }}} */
@@ -193,7 +204,7 @@ ZEND_METHOD(ArchiveEntry, __construct)
 	entry->data_len = 0;
 	entry->filename = estrndup(filename, filename_len);
 
-	archive_entry_copy_stat(entry->entry, stat_sb);
+	archive_entry_copy_stat(entry->entry, &ssb.sb);
 
 	resource_id = zend_list_insert(entry,le_archive_entry);	
 	add_property_resource(this, "entry", resource_id);

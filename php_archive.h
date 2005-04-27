@@ -58,6 +58,7 @@ typedef struct archive_file {
 	char			*filename;
 	char			*buf;
 	int				struct_state;
+	HashTable		*entries;
 } archive_file_t;
 
 #define PHP_ARCHIVE_BUF_LEN 8196
@@ -104,6 +105,7 @@ extern zend_module_entry archive_module_entry;
 
 int _archive_get_rsrc_id(zval * TSRMLS_DC);
 int _archive_get_fd(zval *, archive_file_t ** TSRMLS_DC);
+void _archive_entries_hash_dtor(void *data TSRMLS_DC);
 	
 PHP_MINIT_FUNCTION(archive);
 PHP_MINFO_FUNCTION(archive);

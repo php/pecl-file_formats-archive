@@ -18,43 +18,13 @@
 
 /* $Id$ */
 
-#ifndef PHP_ARCHIVE_ENTRY_H
-#define PHP_ARCHIVE_ENTRY_H
+#ifndef ARCHIVE_UTIL_H
+#define ARCHIVE_UTIL_H
 
-#ifndef S_ISDIR
-#define S_ISDIR(mode)	(((mode)&S_IFMT) == S_IFDIR)
-#endif
-#ifndef S_ISREG
-#define S_ISREG(mode)	(((mode)&S_IFMT) == S_IFREG)
-#endif
-#ifndef S_ISLNK
-#define S_ISLNK(mode)	(((mode)&S_IFMT) == S_IFLNK)
-#endif
+void _archive_normalize_path(char **, int *);
+int _archive_pathname_compare(const void *, const void * TSRMLS_DC);
 
-zend_class_entry *ce_ArchiveEntry;
-
-ZEND_METHOD(ArchiveEntry, __construct);
-ZEND_METHOD(ArchiveEntry, isDir);
-ZEND_METHOD(ArchiveEntry, isFile);
-ZEND_METHOD(ArchiveEntry, isLink);
-ZEND_METHOD(ArchiveEntry, getPathname);
-ZEND_METHOD(ArchiveEntry, getResolvedPathname);
-ZEND_METHOD(ArchiveEntry, getUser);
-ZEND_METHOD(ArchiveEntry, getGroup);
-ZEND_METHOD(ArchiveEntry, getMtime);
-ZEND_METHOD(ArchiveEntry, getSize);
-ZEND_METHOD(ArchiveEntry, getPerms);
-ZEND_METHOD(ArchiveEntry, getData);
-
-PHP_MINIT_FUNCTION(archive_entry);
-
-int le_archive_entry;
-
-int _archive_get_entry_rsrc_id(zval * TSRMLS_DC);
-int _archive_get_entry_struct(zval *, archive_entry_t ** TSRMLS_DC);
-void _archive_entry_free(archive_entry_t * TSRMLS_DC);
-
-#endif /* PHP_ARCHIVE_ENTRY_H */
+#endif	/* ARCHIVE_UTIL_H */
 
 /*
  * Local variables:
