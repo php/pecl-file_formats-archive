@@ -61,7 +61,7 @@ static void _archive_entry_desc_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC);
  */
 static void _archive_entry_desc_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 {
-    archive_entry_t *entry = (archive_entry_t *)rsrc->ptr;
+	archive_entry_t *entry = (archive_entry_t *)rsrc->ptr;
 	_archive_entry_free(entry TSRMLS_CC);	
 }
 /* }}} */
@@ -82,9 +82,11 @@ void _archive_entry_free(archive_entry_t *entry TSRMLS_DC)
 		efree(entry->resolved_filename);
 	}
 	
+	/*
 	if (entry->entry) {
-		archive_entry_free(entry->entry);
+		 archive_entry_free(entry->entry); 
 	}
+	*/
 
 	efree(entry);
 }
