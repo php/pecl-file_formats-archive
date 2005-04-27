@@ -1,3 +1,17 @@
+
+##############################
+#      W A R N I N G !       #
+##############################
+
+Please make sure that your libarchive WAS NOT 
+compiled with flag -D_FILE_OFFSET_BITS=64, as 
+this flag changes struct stat size and as the 
+result you'll get wierd/broken archives.
+
+##############################
+
+
+
 Archive extension API
 
 Constants:

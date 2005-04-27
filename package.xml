@@ -3,7 +3,7 @@
 	<name>archive</name>
 	<summary>archive extension</summary>
 	<description>
-		archive extension allows to read (and probably write in the future)
+		archive extension allows to read and write
 		tar and cpio archives using libarchive (http://people.freebsd.org/~kientzle/libarchive/).
     </description>
     <license>PHP License</license>
@@ -15,11 +15,12 @@
         </maintainer>
 	</maintainers>
 	<release>
-		<version>0.1</version>
-		<date>2005-01-26</date>
-		<state>alpha</state>
+		<version>0.2</version>
+		<date>2005-04-27</date>
+		<state>beta</state>
 		<notes>
-			Initial release.
+			- Reimplemented and turned on by default ArchiveWriter.
+			- Fixed some typobugs and made the code cleaner.
 		</notes>
 	</release>
 	<filelist>
@@ -31,10 +32,12 @@
 			<file role="src">archive_reader.c</file>
 			<file role="src">archive_entry.c</file>
 			<file role="src">archive_writer.c</file>
+			<file role="src">archive_util.c</file>
 			<file role="src">archive_clbk.c</file>
 			<file role="src">php_archive.h</file>
 			<file role="src">archive_reader.h</file>
 			<file role="src">archive_writer.h</file>
+			<file role="src">archive_util.h</file>
 			<file role="src">php_archive_entry.h</file>
 			<file role="src">archive_clbk.h</file>
 			<file role="test">tests/unlink_entry.inc</file>
@@ -95,8 +98,23 @@
 			<file role="test">tests/extract_bz2/004.phpt</file>
 			<file role="test">tests/extract_bz2/005.phpt</file>
 			<file role="test">tests/extract_bz2/006.phpt</file>
+			<file role="test">tests/add/001.phpt</file>
+			<file role="test">tests/add/002.phpt</file>
+			<file role="test">tests/add/003.phpt</file>
+			<file role="test">tests/add_gz/001.phpt</file>
+			<file role="test">tests/add_bz2/001.phpt</file>
          </dir>
 	</filelist>
+	<changelog>
+		<release>
+			<version>0.1</version>
+			<date>2005-01-26</date>
+			<state>alpha</state>
+			<notes>
+				Initial release.
+			</notes>
+		</release>
+	</changelog>
 	<deps>
 		<dep type="php" rel="ge" version="5.0.0"/>
 	</deps>
