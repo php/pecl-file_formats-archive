@@ -33,7 +33,11 @@
 #include "archive_clbk.h"
 #include "php_archive_entry.h"
 
+#if (PHP_MAJOR_VERSION == 5) && (PHP_MINOR_VERSION < 2)
 #define archive_ce_Exception zend_exception_get_default()
+#else
+#define archive_ce_Exception zend_exception_get_default(TSRMLS_C)
+#endif
 
 /* {{{ archive_functions[]
  */
