@@ -60,7 +60,7 @@ zend_module_entry archive_module_entry = {
 	NULL, /*  here   */
 	PHP_MINFO(archive),
 #if ZEND_MODULE_API_NO >= 20010901
-	"0.1",
+	PHP_ARCHIVE_VERSION,
 #endif
 	STANDARD_MODULE_PROPERTIES
 };
@@ -189,7 +189,8 @@ PHP_MINFO_FUNCTION(archive)
 {
 	php_info_print_table_start();
 	php_info_print_table_header(2, "archive support", "enabled");
-	php_info_print_table_row(2, "libarchive version", archive_version());
+	php_info_print_table_row(2, "extension version", PHP_ARCHIVE_VERSION);
+	php_info_print_table_row(2, "libarchive version",  archive_version());
 	php_info_print_table_end();
 }
 /* }}} */
