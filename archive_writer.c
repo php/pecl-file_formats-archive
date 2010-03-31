@@ -35,8 +35,8 @@
 zend_class_entry *ce_ArchiveWriter;
 zend_class_entry *ce_ArchiveWriterInterface;
 
-/* function_entry funcs_ArchiveWriterInterface {{{ */
-function_entry funcs_ArchiveWriterInterface[] = {
+/* zend_function_entry funcs_ArchiveWriterInterface {{{ */
+zend_function_entry funcs_ArchiveWriterInterface[] = {
  	ZEND_ABSTRACT_ME(ArchiveWriter, __construct,  NULL)
 	ZEND_ABSTRACT_ME(ArchiveWriter, addEntry,  NULL)
 	ZEND_ABSTRACT_ME(ArchiveWriter, finish,  NULL)
@@ -44,8 +44,8 @@ function_entry funcs_ArchiveWriterInterface[] = {
 };
 /* }}} */
 
-/* function_entry funcs_ArchiveWriter {{{ */
-function_entry funcs_ArchiveWriter[] = {
+/* zend_function_entry funcs_ArchiveWriter {{{ */
+zend_function_entry funcs_ArchiveWriter[] = {
  	ZEND_ME(ArchiveWriter, __construct,  NULL, 0)
 	ZEND_ME(ArchiveWriter, addEntry,  NULL, 0)
 	ZEND_ME(ArchiveWriter, finish,  NULL, 0)

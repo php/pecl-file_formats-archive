@@ -41,7 +41,7 @@
 
 /* {{{ archive_functions[]
  */
-function_entry archive_functions[] = {
+zend_function_entry archive_functions[] = {
 	{NULL, NULL, NULL}
 };
 /* }}} */

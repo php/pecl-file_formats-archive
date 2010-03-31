@@ -29,8 +29,8 @@
 #include "php_archive.h"
 #include "php_archive_entry.h"
 
-/* function_entry funcs_ArchiveEntry {{{ */
-function_entry funcs_ArchiveEntry[] = {
+/* zend_function_entry funcs_ArchiveEntry {{{ */
+zend_function_entry funcs_ArchiveEntry[] = {
 	ZEND_ME(ArchiveEntry, __construct,  NULL, 0)
 	ZEND_ME(ArchiveEntry, isDir,  NULL, 0)
 	ZEND_ME(ArchiveEntry, isFile,  NULL, 0)

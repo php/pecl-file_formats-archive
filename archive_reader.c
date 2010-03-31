@@ -32,8 +32,8 @@
 zend_class_entry *ce_ArchiveReader;
 zend_class_entry *ce_ArchiveReaderInterface;
 
-/* function_entry funcs_ArchiveReaderInterface {{{ */
-function_entry funcs_ArchiveReaderInterface[] = {
+/* zend_function_entry funcs_ArchiveReaderInterface {{{ */
+zend_function_entry funcs_ArchiveReaderInterface[] = {
  	ZEND_ABSTRACT_ME(ArchiveReader, __construct,  NULL)
 	ZEND_ABSTRACT_ME(ArchiveReader, getNextEntry,  NULL)
 	ZEND_ABSTRACT_ME(ArchiveReader, getCurrentEntryData,  NULL)
@@ -43,8 +43,8 @@ function_entry funcs_ArchiveReaderInterface[] = {
 };
 /* }}} */
 
-/* function_entry funcs_ArchiveReader {{{ */
-function_entry funcs_ArchiveReader[] = {
+/* zend_function_entry funcs_ArchiveReader {{{ */
+zend_function_entry funcs_ArchiveReader[] = {
  	ZEND_ME(ArchiveReader, __construct,  NULL, 0)
 	ZEND_ME(ArchiveReader, getNextEntry,  NULL, 0)
 	ZEND_ME(ArchiveReader, getCurrentEntryData,  NULL, 0)
