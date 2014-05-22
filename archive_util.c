@@ -48,11 +48,11 @@ int _archive_pathname_compare(const void *a, const void *b TSRMLS_DC)
     s = *((Bucket **) b);
 
 	Z_TYPE(first) = IS_STRING;
-	Z_STRVAL(first) = f->arKey;
+	Z_STRVAL(first) = (char *)f->arKey;
 	Z_STRLEN(first) = f->nKeyLength-1;
 
 	Z_TYPE(second) = IS_STRING;
-	Z_STRVAL(second) = s->arKey;
+	Z_STRVAL(second) = (char *)s->arKey;
 	Z_STRLEN(second) = s->nKeyLength-1;
 
     if (string_compare_function(&result, &first, &second TSRMLS_CC) != SUCCESS) {

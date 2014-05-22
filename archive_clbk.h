@@ -24,7 +24,9 @@
 ssize_t _archive_read_clbk(struct archive *, void *, const void **);
 int    _archive_open_clbk(struct archive *, void *);
 int    _archive_close_clbk(struct archive *, void *);
-ssize_t _archive_write_clbk(struct archive *, void *, void *, size_t);
+off_t _archive_skip_clbk(struct archive *, void *, off_t);
+ssize_t _archive_seek_clbk(struct archive *, void *, off_t, int);
+ssize_t _archive_write_clbk(struct archive *, void *, const void *, size_t);
 
 #endif /* ARCHIVE_CLBK_H */
 

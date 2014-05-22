@@ -50,12 +50,13 @@ zend_function_entry funcs_ArchiveEntry[] = {
 static void _archive_entry_desc_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC);	
 
 #define PHP_ENTRY_GET_STRUCT \
-	php_set_error_handling(EH_THROW, ce_ArchiveException TSRMLS_CC); \
+    zend_error_handling error_handling; \
+    zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC); \
 	if(!_archive_get_entry_struct(this, &entry TSRMLS_CC)) { \
-		php_set_error_handling(EH_NORMAL, NULL TSRMLS_CC); \
+        zend_restore_error_handling(&error_handling TSRMLS_CC); \
 		return; \
 	} \
-	php_set_error_handling(EH_NORMAL, NULL TSRMLS_CC);
+    zend_restore_error_handling(&error_handling TSRMLS_CC);
 
 /* {{{ _archive_entry_desc_dtor
  */
@@ -149,27 +150,30 @@ ZEND_METHOD(ArchiveEntry, __construct)
 	archive_entry_t *entry;
 	struct stat *stat_sb;
 	php_stream_statbuf ssb;
+    zend_error_handling error_handling;
 		
-	php_set_error_handling(EH_THROW, ce_ArchiveException TSRMLS_CC);
+    zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC); 
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &filename, &filename_len) == FAILURE) {
-		php_set_error_handling(EH_NORMAL, NULL TSRMLS_CC);
+        zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
 
+#if PHP_API_VERSION < 20100412
 	if (PG(safe_mode) && (!php_checkuid(filename, NULL, CHECKUID_CHECK_FILE_AND_DIR))) {
-		php_set_error_handling(EH_NORMAL, NULL TSRMLS_CC);
+        zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
+#endif
 	
 	if (php_check_open_basedir(filename TSRMLS_CC)) {
-		php_set_error_handling(EH_NORMAL, NULL TSRMLS_CC);
+        zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
 	
 	if (php_stream_stat_path_ex((char *)filename, PHP_STREAM_URL_STAT_LINK, &ssb, NULL)) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "stat failed for %s", filename);
-		php_set_error_handling(EH_NORMAL, NULL TSRMLS_CC);
+        zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
 
@@ -188,7 +192,7 @@ ZEND_METHOD(ArchiveEntry, __construct)
 			if (VCWD_ACCESS(resolved_path_buff, F_OK)) {
 				efree(entry);
 				php_error_docref(NULL TSRMLS_CC, E_WARNING, "stat failed for %s", filename);
-				php_set_error_handling(EH_NORMAL, NULL TSRMLS_CC);
+                zend_restore_error_handling(&error_handling TSRMLS_CC);
 				return;
 			}
 #endif
@@ -211,7 +215,7 @@ ZEND_METHOD(ArchiveEntry, __construct)
 	resource_id = zend_list_insert(entry,le_archive_entry);	
 	add_property_resource(this, "entry", resource_id);
 
-	php_set_error_handling(EH_NORMAL, NULL TSRMLS_CC);
+    zend_restore_error_handling(&error_handling TSRMLS_CC);
 	return;
 }
 /* }}} */

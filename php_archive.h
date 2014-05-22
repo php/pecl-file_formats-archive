@@ -59,33 +59,43 @@ typedef struct archive_file {
 	char			*filename;
 	char			*buf;
 	int				struct_state;
+	int				block_size;
 	HashTable		*entries;
 } archive_file_t;
 
 #define PHP_ARCHIVE_BUF_LEN 8196
 
-#if defined(HAVE_BZ2) && defined(HAVE_ZLIB)
-#define _php_archive_read_support_compression_all(arch) \
-	archive_read_support_compression_bzip2(arch); \
-	archive_read_support_compression_gzip(arch); \
-	archive_read_support_compression_compress(arch);
+#if ARCHIVE_VERSION_NUMBER < 3000000
+#define archive_read_free archive_read_finish
+#define archive_write_free archive_write_finish
+
+#define archive_read_support_filter_all                  archive_read_support_compression_all
+#define archive_read_support_filter_bzip2                archive_read_support_compression_bzip2
+#define archive_read_support_filter_compress             archive_read_support_compression_compress
+#define archive_read_support_filter_gzip                 archive_read_support_compression_gzip
+#define archive_read_support_filter_lzip                 archive_read_support_compression_lzip
+#define archive_read_support_filter_lzma                 archive_read_support_compression_lzma
+#define archive_read_support_filter_none                 archive_read_support_compression_none
+#define archive_read_support_filter_program              archive_read_support_compression_program
+#define archive_read_support_filter_program_signature    archive_read_support_compression_program_signature
+#define archive_read_support_filter_rpm                  archive_read_support_compression_rpm
+#define archive_read_support_filter_uu                   archive_read_support_compression_uu
+#define archive_read_support_filter_xz                   archive_read_support_compression_xz
+
+#define archive_write_add_filter_bzip2     archive_write_set_compression_bzip2
+#define archive_write_add_filter_compress  archive_write_set_compression_compress
+#define archive_write_add_filter_gzip      archive_write_set_compression_gzip
+#define archive_write_add_filter_lzip      archive_write_set_compression_lzip
+#define archive_write_add_filter_lzma      archive_write_set_compression_lzma
+#define archive_write_add_filter_none      archive_write_set_compression_none
+#define archive_write_add_filter_program   archive_write_set_compression_program
+#define archive_write_add_filter_xz        archive_write_set_compression_xz
 #endif
 
-#if defined(HAVE_BZ2) && !defined(HAVE_ZLIB)
-#define _php_archive_read_support_compression_all(arch) \
-	archive_read_support_compression_bzip2(arch); \
-	archive_read_support_compression_compress(arch);
-#endif
-
-#if !defined(HAVE_BZ2) && defined(HAVE_ZLIB)
-#define _php_archive_read_support_compression_all(arch) \
-	archive_read_support_compression_gzip(arch); \
-	archive_read_support_compression_compress(arch);
-#endif
-
-#if !defined(HAVE_BZ2) && !defined(HAVE_ZLIB)
-#define _php_archive_read_support_compression_all(arch) \
-	archive_read_support_compression_compress(arch);
+#if ZEND_MODULE_API_NO < 20090626
+typedef  int zend_error_handling;
+#define zend_replace_error_handling(type, exception, current) php_set_error_handling((type), (exception) TSRMLS_CC)
+#define zend_restore_error_handling(exception) php_set_error_handling(EH_NORMAL, NULL TSRMLS_CC)
 #endif
 
 PHPAPI zend_class_entry *ce_ArchiveException;
