@@ -24,7 +24,7 @@
 #include <archive.h>
 #include <archive_entry.h>
 
-#define PHP_ARCHIVE_VERSION					"0.3.0-dev"
+#define PHP_ARCHIVE_VERSION					"0.3.1-dev"
 
 #define	PHP_ARCHIVE_FORMAT_TAR				(1<<0) 
 #define	PHP_ARCHIVE_FORMAT_CPIO				(1<<1)
