@@ -85,7 +85,6 @@ off_t _archive_skip_clbk(struct archive *a, void *client_data, off_t request){
         if(r < 0){
             return 0; 
         }
-        printf("php archive: skip %d\n", size);
         return size;
     }
 }/*}}}*/
@@ -98,7 +97,6 @@ ssize_t _archive_seek_clbk(struct archive *a, void *client_data, off_t offset, i
     TSRMLS_FETCH();
 
     r = php_stream_seek(arch->stream, offset, whence);
-    printf("php archive: seek %d, whence %d, r:%d\n", offset, whence, r);
     if(r == 0){
 
         return php_stream_tell(arch->stream);
