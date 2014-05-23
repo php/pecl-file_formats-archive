@@ -71,13 +71,19 @@ ssize_t _archive_write_clbk(struct archive *a, void *client_data, const void *bu
  * */
 off_t _archive_skip_clbk(struct archive *a, void *client_data, off_t request){
     archive_file_t *arch = (archive_file_t *)client_data;
-    size_t size, r;
+    off_t size;
+    int r;
+
+    if(request == 0){
+        return 0;
+    }
            
     TSRMLS_FETCH();
     if(arch->stream){
-        size = arch->block_size > 0 
-            ? (request/arch->block_size) * arch->block_size \
-            : request;
+        size = (request/arch->block_size) * arch->block_size;
+        if(size == 0){ /*do not break a block*/
+            return 0;
+        }
         /*TODO maybe lasy seek is a better idea for performance
          * refer: libarchive archive_read_open_filename.c file_skip_lseek
          * */
@@ -85,8 +91,10 @@ off_t _archive_skip_clbk(struct archive *a, void *client_data, off_t request){
         if(r < 0){
             return 0; 
         }
+        printf("archive request:%d skipped:%d\n", request, size);
         return size;
     }
+    return 0;
 }/*}}}*/
 
 /* {{{ _archive_seek_clbk
