@@ -31,7 +31,8 @@ Classes:
 
 class ArchiveReader {
 	/** 
-	* ArchiveReader __construct (string filename[, int format[, int compression]])
+	* ArchiveReader __construct (string filename[, int format[, int
+    * compression [, int block_size]]])
 	* 
 	* You need to specify format & compression params *only* if you need 
 	* to support only these particular formats/compressions.
