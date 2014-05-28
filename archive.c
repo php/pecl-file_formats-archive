@@ -12,7 +12,7 @@
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
   +----------------------------------------------------------------------+
-  | Author: Antony Dovgal <antony@zend.com>                              |
+  | Author: Antony Dovgal <tony2001@php.net>                             |
   +----------------------------------------------------------------------+
 */
 
@@ -69,9 +69,9 @@ zend_module_entry archive_module_entry = {
 #ifdef COMPILE_DL_ARCHIVE
 ZEND_GET_MODULE(archive)
 #endif
-	
+
 static void _archive_desc_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC);
-	
+
 /* {{{ _archive_entries_hash_dtor
  */
 void _archive_entries_hash_dtor(void *data)
@@ -87,7 +87,7 @@ void _archive_entries_hash_dtor(void *data)
  */
 static void _archive_desc_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 {
-    archive_file_t *arch = (archive_file_t *)rsrc->ptr;
+	 archive_file_t *arch = (archive_file_t *)rsrc->ptr;
 
 	if (arch->mode == PHP_ARCHIVE_READ_MODE) {
 		archive_read_free(arch->arch);
@@ -96,11 +96,11 @@ static void _archive_desc_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 		archive_write_close(arch->arch);
 		archive_write_free(arch->arch);
 	}
-	
+
 	if (arch->stream) {
 		php_stream_close(arch->stream);
 	}
-	
+
 	if (arch->filename) {
 		efree(arch->filename);
 	}
@@ -120,12 +120,12 @@ static void _archive_desc_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 int _archive_get_rsrc_id(zval *this TSRMLS_DC)
 {
 	zval **prop;
-	
-    if (zend_hash_find(Z_OBJPROP_P(this), "fd", sizeof("fd"), (void **)&prop) == FAILURE) {
-        php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to find archive file descriptor");
-        return 0;
-    }
-	
+
+	if (zend_hash_find(Z_OBJPROP_P(this), "fd", sizeof("fd"), (void **)&prop) == FAILURE) {
+		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to find archive file descriptor");
+		return 0;
+	}
+
 	return Z_LVAL_PP(prop);
 }
 /* }}} */
@@ -135,7 +135,7 @@ int _archive_get_rsrc_id(zval *this TSRMLS_DC)
 int _archive_get_fd(zval *this, archive_file_t **arch TSRMLS_DC)
 {
 	int resource_id, type;
-	
+
 
 	if ((resource_id = _archive_get_rsrc_id(this TSRMLS_CC))) {
 		*arch = (archive_file_t *) zend_list_find(resource_id, &type);
@@ -153,12 +153,12 @@ int _archive_get_fd(zval *this, archive_file_t **arch TSRMLS_DC)
 PHP_MINIT_FUNCTION(archive)
 {
 	zend_class_entry tmp_ce_ArchiveException;
-	
+
 	le_archive = zend_register_list_destructors_ex(_archive_desc_dtor, NULL, "archive descriptor", module_number);
-	
+
 	INIT_CLASS_ENTRY(tmp_ce_ArchiveException, "ArchiveException", NULL);
 	ce_ArchiveException = zend_register_internal_class_ex(&tmp_ce_ArchiveException, archive_ce_Exception, NULL TSRMLS_CC);
-	
+
 	PHP_MINIT(archive_entry)(INIT_FUNC_ARGS_PASSTHRU);
 	PHP_MINIT(archive_reader)(INIT_FUNC_ARGS_PASSTHRU);
 
@@ -178,7 +178,7 @@ PHP_MINIT_FUNCTION(archive)
 #endif
 	REGISTER_LONG_CONSTANT("ARCH_COMPRESSION_COMPRESS", PHP_ARCHIVE_COMPRESSION_COMPRESS, CONST_CS | CONST_PERSISTENT);
 	REGISTER_LONG_CONSTANT("ARCH_COMPRESSION_NONE", PHP_ARCHIVE_COMPRESSION_NONE, CONST_CS | CONST_PERSISTENT);
-	
+
 	return SUCCESS;
 }
 /* }}} */
