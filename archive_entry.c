@@ -12,7 +12,7 @@
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
   +----------------------------------------------------------------------+
-  | Author: Antony Dovgal <antony@zend.com>                              |
+  | Author: Antony Dovgal <tony2001@php.net>                             |
   +----------------------------------------------------------------------+
 */
 
@@ -50,13 +50,13 @@ zend_function_entry funcs_ArchiveEntry[] = {
 static void _archive_entry_desc_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC);	
 
 #define PHP_ENTRY_GET_STRUCT \
-    zend_error_handling error_handling; \
-    zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC); \
+	zend_error_handling error_handling; \
+	zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC); \
 	if(!_archive_get_entry_struct(this, &entry TSRMLS_CC)) { \
-        zend_restore_error_handling(&error_handling TSRMLS_CC); \
+		zend_restore_error_handling(&error_handling TSRMLS_CC); \
 		return; \
 	} \
-    zend_restore_error_handling(&error_handling TSRMLS_CC);
+	zend_restore_error_handling(&error_handling TSRMLS_CC);
 
 /* {{{ _archive_entry_desc_dtor
  */
@@ -99,10 +99,10 @@ int _archive_get_entry_rsrc_id(zval *this TSRMLS_DC)
 {
 	zval **prop;
 	
-    if (zend_hash_find(Z_OBJPROP_P(this), "entry", sizeof("entry"), (void **)&prop) == FAILURE) {
-        php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to find entry descriptor");
-        return 0;
-    }
+	if (zend_hash_find(Z_OBJPROP_P(this), "entry", sizeof("entry"), (void **)&prop) == FAILURE) {
+		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unable to find entry descriptor");
+		return 0;
+	}
 	
 	return Z_LVAL_PP(prop);
 }
@@ -150,30 +150,30 @@ ZEND_METHOD(ArchiveEntry, __construct)
 	archive_entry_t *entry;
 	struct stat *stat_sb;
 	php_stream_statbuf ssb;
-    zend_error_handling error_handling;
-		
-    zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC); 
+	zend_error_handling error_handling;
+
+	zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC); 
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &filename, &filename_len) == FAILURE) {
-        zend_restore_error_handling(&error_handling TSRMLS_CC);
+		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
 
 #if PHP_API_VERSION < 20100412
 	if (PG(safe_mode) && (!php_checkuid(filename, NULL, CHECKUID_CHECK_FILE_AND_DIR))) {
-        zend_restore_error_handling(&error_handling TSRMLS_CC);
+		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
 #endif
-	
+
 	if (php_check_open_basedir(filename TSRMLS_CC)) {
-        zend_restore_error_handling(&error_handling TSRMLS_CC);
+		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
-	
+
 	if (php_stream_stat_path_ex((char *)filename, PHP_STREAM_URL_STAT_LINK, &ssb, NULL)) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "stat failed for %s", filename);
-        zend_restore_error_handling(&error_handling TSRMLS_CC);
+		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
 
@@ -181,18 +181,18 @@ ZEND_METHOD(ArchiveEntry, __construct)
 
 	entry = (archive_entry_t *) emalloc(sizeof(archive_entry_t));
 	entry->resolved_filename = NULL;
-	
+
 #if (!defined(__BEOS__) && !defined(NETWARE) && HAVE_REALPATH) || defined(ZTS)
 	if (S_ISLNK(stat_sb->st_mode)) {	
 		char resolved_path_buff[MAXPATHLEN];
 
 		if (VCWD_REALPATH(filename, resolved_path_buff)) {
-/* TODO figure out if we need this check */
+			/* TODO figure out if we need this check */
 #if 0 && defined(ZTS)
 			if (VCWD_ACCESS(resolved_path_buff, F_OK)) {
 				efree(entry);
 				php_error_docref(NULL TSRMLS_CC, E_WARNING, "stat failed for %s", filename);
-                zend_restore_error_handling(&error_handling TSRMLS_CC);
+				zend_restore_error_handling(&error_handling TSRMLS_CC);
 				return;
 			}
 #endif

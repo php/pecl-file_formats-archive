@@ -12,7 +12,7 @@
   | obtain it through the world-wide-web, please send a note to          |
   | license@php.net so we can mail you a copy immediately.               |
   +----------------------------------------------------------------------+
-  | Author: Antony Dovgal <antony@zend.com>                              |
+  | Author: Antony Dovgal <tony2001@php.net>                             |
   +----------------------------------------------------------------------+
 */
 
@@ -32,7 +32,6 @@ ssize_t _archive_read_clbk(struct archive *a, void *client_data, const void **bu
 {
 	archive_file_t *arch = (archive_file_t *)client_data;
 	ssize_t len = 0;
-
 	TSRMLS_FETCH();
 
 	if (arch->stream == NULL) {
@@ -53,7 +52,6 @@ ssize_t _archive_write_clbk(struct archive *a, void *client_data, const void *bu
 {
 	archive_file_t *arch = (archive_file_t *)client_data;
 	ssize_t len;
-	
 	TSRMLS_FETCH();
 	
 	if (arch->stream == NULL) {
@@ -69,47 +67,49 @@ ssize_t _archive_write_clbk(struct archive *a, void *client_data, const void *bu
 
 /* {{{ _archive_skip_clbk
  * */
-off_t _archive_skip_clbk(struct archive *a, void *client_data, off_t request){
-    archive_file_t *arch = (archive_file_t *)client_data;
-    off_t size;
-    int r;
+off_t _archive_skip_clbk(struct archive *a, void *client_data, off_t request)
+{
+	archive_file_t *arch = (archive_file_t *)client_data;
+	off_t size;
+	int r;
+	TSRMLS_FETCH();
 
-    if(request == 0){
-        return 0;
-    }
-           
-    TSRMLS_FETCH();
-    if(arch->stream){
-        size = (request/arch->block_size) * arch->block_size;
-        if(size == 0){ /*do not break a block*/
-            return 0;
-        }
-        /*TODO maybe lasy seek is a better idea for performance
-         * refer: libarchive archive_read_open_filename.c file_skip_lseek
-         * */
-        r = php_stream_seek(arch->stream, size, SEEK_CUR);
-        if(r < 0){
-            return 0; 
-        }
-        printf("archive request:%d skipped:%d\n", request, size);
-        return size;
-    }
-    return 0;
-}/*}}}*/
+	if(request == 0) {
+		return 0;
+	}
+
+	if(arch->stream){
+		size = (request/arch->block_size) * arch->block_size;
+		if(size == 0){ /*do not break a block*/
+			return 0;
+		}
+		/*TODO maybe lasy seek is a better idea for performance
+		 * refer: libarchive archive_read_open_filename.c file_skip_lseek
+		 * */
+		r = php_stream_seek(arch->stream, size, SEEK_CUR);
+		if(r < 0){
+			return 0; 
+		}
+		return size;
+	}
+	return 0;
+}
+/*}}}*/
 
 /* {{{ _archive_seek_clbk
  * */
-ssize_t _archive_seek_clbk(struct archive *a, void *client_data, off_t offset, int whence){
-    int r;
-    archive_file_t *arch = (archive_file_t *)client_data;
-    TSRMLS_FETCH();
+ssize_t _archive_seek_clbk(struct archive *a, void *client_data, off_t offset, int whence)
+{
+	int r;
+	archive_file_t *arch = (archive_file_t *)client_data;
+	TSRMLS_FETCH();
 
-    r = php_stream_seek(arch->stream, offset, whence);
-    if(r == 0){
+	r = php_stream_seek(arch->stream, offset, whence);
+	if(r == 0){
 
-        return php_stream_tell(arch->stream);
-    }
-    return r;
+		return php_stream_tell(arch->stream);
+	}
+	return r;
 }/*}}}*/
 
 /* {{{ _archive_open_clbk
@@ -117,7 +117,6 @@ ssize_t _archive_seek_clbk(struct archive *a, void *client_data, off_t offset, i
 int _archive_open_clbk(struct archive *a, void *client_data)
 {
 	archive_file_t *arch = (archive_file_t *)client_data;
-	
 	TSRMLS_FETCH();
 
 	if (arch->mode == PHP_ARCHIVE_WRITE_MODE) {
@@ -125,17 +124,17 @@ int _archive_open_clbk(struct archive *a, void *client_data)
 	} else if (arch->mode == PHP_ARCHIVE_READ_MODE) {
 		arch->stream = php_stream_open_wrapper_ex(arch->filename, "r", ENFORCE_SAFE_MODE | REPORT_ERRORS, NULL, NULL);
 	}
-	
+
 	if (arch->stream) {
-        /* Use libarchive to manage buffer
-         * here we set non-buffer of php stream
-         * */
-        arch->stream->flags |= PHP_STREAM_FLAG_NO_BUFFER;
-        if((arch->stream->flags & PHP_STREAM_FLAG_NO_SEEK) == 0){
-            archive_read_set_skip_callback(arch->arch, _archive_skip_clbk);
-            /*TODO it is usually not a good idea to support seek
-             * archive_read_set_seek_callback(arch->arch, _archive_seek_clbk);*/
-        }
+		/* Use libarchive to manage buffer
+		 * here we set non-buffer of php stream
+		 * */
+		arch->stream->flags |= PHP_STREAM_FLAG_NO_BUFFER;
+		if((arch->stream->flags & PHP_STREAM_FLAG_NO_SEEK) == 0){
+			archive_read_set_skip_callback(arch->arch, _archive_skip_clbk);
+			/*TODO it is usually not a good idea to support seek
+			 * archive_read_set_seek_callback(arch->arch, _archive_seek_clbk);*/
+		}
 		return 0;
 	}
 	return 1;
@@ -147,7 +146,6 @@ int _archive_open_clbk(struct archive *a, void *client_data)
 int _archive_close_clbk(struct archive *a, void *client_data)
 {
 	archive_file_t *arch = (archive_file_t *)client_data;
-	
 	TSRMLS_FETCH();
 
 	if (arch->stream) {
