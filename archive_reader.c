@@ -37,6 +37,7 @@ zend_function_entry funcs_ArchiveReaderInterface[] = {
  	ZEND_ABSTRACT_ME(ArchiveReader, __construct,  NULL)
 	ZEND_ABSTRACT_ME(ArchiveReader, getNextEntry,  NULL)
 	ZEND_ABSTRACT_ME(ArchiveReader, getCurrentEntryData,  NULL)
+	ZEND_ABSTRACT_ME(ArchiveReader, skipCurrentEntryData,  NULL)
 	ZEND_ABSTRACT_ME(ArchiveReader, extractCurrentEntry,  NULL)
 	ZEND_ABSTRACT_ME(ArchiveReader, close,  NULL)
 	{NULL, NULL, NULL}
@@ -48,6 +49,7 @@ zend_function_entry funcs_ArchiveReader[] = {
  	ZEND_ME(ArchiveReader, __construct,  NULL, 0)
 	ZEND_ME(ArchiveReader, getNextEntry,  NULL, 0)
 	ZEND_ME(ArchiveReader, getCurrentEntryData,  NULL, 0)
+	ZEND_ME(ArchiveReader, skipCurrentEntryData,  NULL, 0)
 	ZEND_ME(ArchiveReader, extractCurrentEntry,  NULL, 0)
 	ZEND_ME(ArchiveReader, close,  NULL, 0)
 	{NULL, NULL, NULL}
@@ -348,6 +350,29 @@ ZEND_METHOD(ArchiveReader, getCurrentEntryData)
 	RETURN_STRINGL(arch->current_entry->data, arch->current_entry->data_len, 1);
 }
 /* }}} */
+
+/* ArchiveReader::skipCurrentData{{{
+ * */
+ZEND_METHOD(ArchiveReader, skipCurrentEntryData){
+	zval *this = getThis();
+	archive_file_t *arch;
+	zend_error_handling error_handling;
+	int r;
+	
+	zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC);
+
+	if (!_archive_get_fd(this, &arch TSRMLS_CC)) {
+		zend_restore_error_handling(&error_handling TSRMLS_CC);
+		return;
+	}
+	r = archive_read_data_skip(arch->arch);
+	if(r != ARCHIVE_OK){
+		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Skip archive entry failed");
+		zend_restore_error_handling(&error_handling TSRMLS_CC);
+		return;
+	}
+	return;
+}/*}}}*/
 
 /* ArchiveReader::extractCurrentEntry {{{
  *
