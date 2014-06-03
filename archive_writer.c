@@ -82,7 +82,7 @@ ZEND_METHOD(ArchiveWriter, __construct)
 	zval *this = getThis();
 	const char *error_string = NULL;
 	char *filename;
-	int error_num, filename_len, result, format=0, compression=0;
+	long error_num, filename_len, result, format=0, compression=0;
     zend_error_handling error_handling;
 	
     zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC);

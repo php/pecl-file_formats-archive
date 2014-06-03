@@ -12,7 +12,7 @@ try {
 }
 
 try {
-	$ar = new ArchiveReader(".");
+	var_dump($ar = new ArchiveReader("."));
 } catch (ArchiveException $e) {
 	var_dump($e);
 }

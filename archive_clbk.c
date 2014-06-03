@@ -106,7 +106,6 @@ ssize_t _archive_seek_clbk(struct archive *a, void *client_data, off_t offset, i
 
 	r = php_stream_seek(arch->stream, offset, whence);
 	if(r == 0){
-
 		return php_stream_tell(arch->stream);
 	}
 	return r;
@@ -121,22 +120,26 @@ int _archive_open_clbk(struct archive *a, void *client_data)
 
 	if (arch->mode == PHP_ARCHIVE_WRITE_MODE) {
 		arch->stream = php_stream_open_wrapper_ex(arch->filename, "w", ENFORCE_SAFE_MODE | REPORT_ERRORS, NULL, NULL);
+		if (arch->stream) {
+			return 0;
+		}
 	} else if (arch->mode == PHP_ARCHIVE_READ_MODE) {
 		arch->stream = php_stream_open_wrapper_ex(arch->filename, "r", ENFORCE_SAFE_MODE | REPORT_ERRORS, NULL, NULL);
+		if (arch->stream) {
+			/* Use libarchive to manage buffer
+			 * here we set non-buffer of php stream
+			 * */
+			arch->stream->flags |= PHP_STREAM_FLAG_NO_BUFFER;
+			if((arch->stream->flags & PHP_STREAM_FLAG_NO_SEEK) == 0){
+				archive_read_set_skip_callback(arch->arch, _archive_skip_clbk);
+				archive_read_set_seek_callback(arch->arch, _archive_seek_clbk);
+				/*TODO it is usually not a good idea to support seek
+				 * archive_read_set_seek_callback(arch->arch, _archive_seek_clbk);*/
+			}
+			return 0;
+		}
 	}
 
-	if (arch->stream) {
-		/* Use libarchive to manage buffer
-		 * here we set non-buffer of php stream
-		 * */
-		arch->stream->flags |= PHP_STREAM_FLAG_NO_BUFFER;
-		if((arch->stream->flags & PHP_STREAM_FLAG_NO_SEEK) == 0){
-			archive_read_set_skip_callback(arch->arch, _archive_skip_clbk);
-			/*TODO it is usually not a good idea to support seek
-			 * archive_read_set_seek_callback(arch->arch, _archive_seek_clbk);*/
-		}
-		return 0;
-	}
 	return 1;
 }
 /* }}} */
