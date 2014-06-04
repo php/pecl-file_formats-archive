@@ -133,8 +133,6 @@ int _archive_open_clbk(struct archive *a, void *client_data)
 			if((arch->stream->flags & PHP_STREAM_FLAG_NO_SEEK) == 0){
 				archive_read_set_skip_callback(arch->arch, _archive_skip_clbk);
 				archive_read_set_seek_callback(arch->arch, _archive_seek_clbk);
-				/*TODO it is usually not a good idea to support seek
-				 * archive_read_set_seek_callback(arch->arch, _archive_seek_clbk);*/
 			}
 			return 0;
 		}
