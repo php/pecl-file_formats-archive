@@ -24,8 +24,11 @@
 PHP_MINIT_FUNCTION(archive_reader);
 
 ZEND_METHOD(ArchiveReader, __construct);
+ZEND_METHOD(ArchiveReader, getStream);
+ZEND_METHOD(ArchiveReader, getArchiveFormat);
 ZEND_METHOD(ArchiveReader, getNextEntry);
 ZEND_METHOD(ArchiveReader, getCurrentEntryData);
+ZEND_METHOD(ArchiveReader, readCurrentEntryData);
 ZEND_METHOD(ArchiveReader, skipCurrentEntryData);
 ZEND_METHOD(ArchiveReader, extractCurrentEntry);
 ZEND_METHOD(ArchiveReader, close);
