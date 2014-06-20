@@ -59,7 +59,17 @@ class ArchiveReader {
 	* You can also get entry's data with ArchiveEntry->getData() if 
 	* fetch_entry_data was TRUE.
 	*/
+
 	public function getNextEntry($fetch_entry_data);
+
+	/**
+	* PHP_STREAM getStream()
+	* 
+	* Get the PHP Stream object
+	*
+	* You can use fread/ftell just like file handles
+	*/
+	public function getStream()
 	
 	/** 	 
 	* string getCurrentEntryData(void)
@@ -69,6 +79,16 @@ class ArchiveReader {
 	* You can also get it with ArchiveEntry->getData() after that.
 	*/
 	public function getCurrentEntryData();
+
+	/**
+	* string readCurrentEntryData(count)
+    *
+	* Just the same as getCurrentEntryData expect return *count* bytes.
+	* 
+	* You can call this method multipule times until return an empty string
+	* which indicates an EOF
+	*/
+	public function readCurrentEntryData(count);
 	
 	/** 
 	* bool extractCurrentEntry(void)
