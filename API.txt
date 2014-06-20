@@ -89,6 +89,15 @@ class ArchiveReader {
 	* which indicates an EOF
 	*/
 	public function readCurrentEntryData(count);
+
+	/**
+	* skipCurrentEntryData()
+	*
+	* Skip current entry explicitly, this is useful when you need to get the
+	* position of next header
+	* 
+	*/
+	public function skipCurrentEntryData();
 	
 	/** 
 	* bool extractCurrentEntry(void)
