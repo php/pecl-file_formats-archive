@@ -79,13 +79,7 @@ off_t _archive_skip_clbk(struct archive *a, void *client_data, off_t request)
 	}
 
 	if(arch->stream){
-		size = (request/arch->block_size) * arch->block_size;
-		if(size == 0){ /*do not break a block*/
-			return 0;
-		}
-		/*TODO maybe lasy seek is a better idea for performance
-		 * refer: libarchive archive_read_open_filename.c file_skip_lseek
-		 * */
+		size = request;
 		r = php_stream_seek(arch->stream, size, SEEK_CUR);
 		if(r < 0){
 			return 0; 

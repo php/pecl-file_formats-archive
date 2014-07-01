@@ -24,7 +24,7 @@
 #include <archive.h>
 #include <archive_entry.h>
 
-#define PHP_ARCHIVE_VERSION					"0.4.0-dev"
+#define PHP_ARCHIVE_VERSION					"0.4.1-dev"
 
 #define	PHP_ARCHIVE_FORMAT_NONE		        (0)
 #define	PHP_ARCHIVE_FORMAT_TAR				ARCHIVE_FORMAT_TAR 
