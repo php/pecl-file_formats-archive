@@ -177,9 +177,6 @@ ZEND_METHOD(ArchiveReader, __construct)
 		if (arch->stream) {
 			php_stream_close(arch->stream);
 		}
-		efree(arch->filename);
-		efree(arch->buf);
-		efree(arch);
 		if (error_num && error_string) {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to open file %s for reading: error #%d, %s", filename, error_num, error_string);
 		}
@@ -187,6 +184,10 @@ ZEND_METHOD(ArchiveReader, __construct)
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to open file %s for reading: unknown error %d", filename, result);
 		}	
         zend_restore_error_handling(&error_handling TSRMLS_CC);
+		archive_read_free(arch->arch);
+		efree(arch->filename);
+		efree(arch->buf);
+		efree(arch);
 		return;
 	}
 
