@@ -181,10 +181,10 @@ ZEND_METHOD(ArchiveReader, __construct)
 		efree(arch->buf);
 		efree(arch);
 		if (error_num && error_string) {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to open file %s for reading: error #%d, %s", filename, error_num, error_string);
+			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to open file %s for reading: error #%ld, %s", filename, error_num, error_string);
 		}
 		else {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to open file %s for reading: unknown error %d", filename, result);
+			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to open file %s for reading: unknown error %ld", filename, result);
 		}
 		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
@@ -205,7 +205,6 @@ ZEND_METHOD(ArchiveReader, getArchiveFormat) {
 	long format;
 	zval *this = getThis();
 	archive_file_t *arch;
-	struct archive *a;
     zend_error_handling error_handling;
 
     zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC);
@@ -346,7 +345,7 @@ ZEND_METHOD(ArchiveReader, getNextEntry)
 ZEND_METHOD(ArchiveReader, readCurrentEntryData) {
 	zval *this = getThis();
 	archive_file_t *arch;
-	char *buf, *error_string;
+	const char *error_string;
 	size_t len;
 	int r, error_num;
 	long count;
@@ -478,7 +477,8 @@ ZEND_METHOD(ArchiveReader, extractCurrentEntry)
 {
 	zval *this = getThis();
 	archive_file_t *arch;
-	int result, error_num, flags = 0;
+	int result, error_num;
+	long flags = 0;
 	const char *error_string;
     zend_error_handling error_handling;
 

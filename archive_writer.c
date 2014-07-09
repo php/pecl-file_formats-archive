@@ -137,7 +137,7 @@ ZEND_METHOD(ArchiveWriter, __construct)
 			/* always supported */
 			break;
 		default:
-			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unsupported compression type %d", compression);
+			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unsupported compression type %ld", compression);
 			zend_restore_error_handling(&error_handling TSRMLS_CC);
 			return;
 			break;
@@ -162,7 +162,7 @@ ZEND_METHOD(ArchiveWriter, __construct)
 			archive_write_set_format_ustar(arch->arch);
 			break;
 		default:
-			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unsupported archive format: %d", format);
+			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unsupported archive format: %ld", format);
 			zend_restore_error_handling(&error_handling TSRMLS_CC);
 			return;
 			break;
@@ -180,10 +180,10 @@ ZEND_METHOD(ArchiveWriter, __construct)
 		efree(arch->buf);
 		efree(arch);
 		if (error_num && error_string) {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to open file %s for writing: error #%d, %s", filename, error_num, error_string);
+			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to open file %s for writing: error #%ld, %s", filename, error_num, error_string);
 		}
 		else {
-			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to open file %s for writing: unknown error %d", filename, result);
+			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to open file %s for writing: unknown error %ld", filename, result);
 		}
 		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
@@ -249,7 +249,6 @@ ZEND_METHOD(ArchiveWriter, addEntry)
 	entry_copy = emalloc(sizeof(archive_entry_t));
 	memcpy(entry_copy, entry, sizeof(archive_entry_t));
 	entry_copy->entry = archive_entry_new();
-	memcpy(entry_copy->entry, entry->entry, sizeof(entry->entry));
 	entry_copy->filename = estrdup(entry->filename);
 
 	entry_copy->data = NULL;
