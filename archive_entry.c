@@ -215,7 +215,7 @@ ZEND_METHOD(ArchiveEntry, __construct)
 	resource_id = zend_list_insert(entry,le_archive_entry);	
 	add_property_resource(this, "entry", resource_id);
 
-    zend_restore_error_handling(&error_handling TSRMLS_CC);
+	zend_restore_error_handling(&error_handling TSRMLS_CC);
 	return;
 }
 /* }}} */

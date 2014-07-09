@@ -58,16 +58,16 @@ zend_function_entry funcs_ArchiveWriter[] = {
 PHP_MINIT_FUNCTION(archive_writer)
 {
 	zend_class_entry tmp_ce_ArchiveWriter, tmp_ce_ArchiveWriterInterface;
-	
+
 	INIT_CLASS_ENTRY(tmp_ce_ArchiveWriterInterface, "ArchiveWriterInterface", funcs_ArchiveWriterInterface);
 	ce_ArchiveWriterInterface = zend_register_internal_class(&tmp_ce_ArchiveWriterInterface TSRMLS_CC);
 	ce_ArchiveWriterInterface->ce_flags = ZEND_ACC_INTERFACE;
-	
+
 	INIT_CLASS_ENTRY(tmp_ce_ArchiveWriter, "ArchiveWriter", funcs_ArchiveWriter);
 	ce_ArchiveWriter = zend_register_internal_class(&tmp_ce_ArchiveWriter TSRMLS_CC);
-	
+
 	zend_class_implements(ce_ArchiveWriter TSRMLS_CC, 1, ce_ArchiveWriterInterface);
-	
+
 	return SUCCESS;
 }
 /* }}} */
@@ -75,7 +75,7 @@ PHP_MINIT_FUNCTION(archive_writer)
 /* ArchiveWriter::__construct {{{
  *
 */
-ZEND_METHOD(ArchiveWriter, __construct) 
+ZEND_METHOD(ArchiveWriter, __construct)
 {
 	archive_file_t *arch = NULL;
 	int resource_id;
@@ -83,62 +83,62 @@ ZEND_METHOD(ArchiveWriter, __construct)
 	const char *error_string = NULL;
 	char *filename;
 	long error_num, filename_len, result, format=0, compression=0;
-    zend_error_handling error_handling;
-	
-    zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC);
-	
+	zend_error_handling error_handling;
+
+	zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC);
+
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|ll", &filename, &filename_len, &format, &compression) == FAILURE) {
-        zend_restore_error_handling(&error_handling TSRMLS_CC);
+		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
 
 #if PHP_API_VERSION < 20100412
 	if (PG(safe_mode) && (!php_checkuid(filename, NULL, CHECKUID_CHECK_FILE_AND_DIR))) {
-        zend_restore_error_handling(&error_handling TSRMLS_CC);
+		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
 #endif
-	
+
 	if (php_check_open_basedir(filename TSRMLS_CC)) {
-        zend_restore_error_handling(&error_handling TSRMLS_CC);
+		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
-	
+
 	arch = (archive_file_t *) emalloc(sizeof(archive_file_t));
-	
+
 	arch->stream = NULL;
 
 	ALLOC_HASHTABLE(arch->entries);
 	zend_hash_init(arch->entries, 10, NULL, _archive_entries_hash_dtor, 0);
-	
+
 	arch->mode = PHP_ARCHIVE_WRITE_MODE;
 	arch->buf = emalloc(PHP_ARCHIVE_BUF_LEN + 1);
-	arch->filename = estrndup(filename, filename_len);	
+	arch->filename = estrndup(filename, filename_len);
 	arch->arch = archive_write_new();
 
 	switch (compression) {
 		case PHP_ARCHIVE_COMPRESSION_GZIP:
-			if(archive_write_add_filter_gzip(arch->arch) != ARCHIVE_OK){
-                php_error_docref(NULL TSRMLS_CC, E_WARNING, "Gzip compression is not supported in this build");
-                zend_restore_error_handling(&error_handling TSRMLS_CC);
-                return;
-            }
+			if (archive_write_add_filter_gzip(arch->arch) != ARCHIVE_OK) {
+				php_error_docref(NULL TSRMLS_CC, E_WARNING, "Gzip compression is not supported in this build");
+				zend_restore_error_handling(&error_handling TSRMLS_CC);
+				return;
+			}
 			break;
 
 		case PHP_ARCHIVE_COMPRESSION_BZIP2:
-            if(archive_write_add_filter_bzip2(arch->arch) != ARCHIVE_OK){
-                php_error_docref(NULL TSRMLS_CC, E_WARNING, "Bzip2 compression is not supported in this build");
-                zend_restore_error_handling(&error_handling TSRMLS_CC);
-                return;
-            }
-			break; 
+			if (archive_write_add_filter_bzip2(arch->arch) != ARCHIVE_OK) {
+				php_error_docref(NULL TSRMLS_CC, E_WARNING, "Bzip2 compression is not supported in this build");
+				zend_restore_error_handling(&error_handling TSRMLS_CC);
+				return;
+			}
+			break;
 		case 0: /* default value */
 		case PHP_ARCHIVE_COMPRESSION_NONE:
 			/* always supported */
 			break;
 		default:
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unsupported compression type %d", compression);
-            zend_restore_error_handling(&error_handling TSRMLS_CC);
+			zend_restore_error_handling(&error_handling TSRMLS_CC);
 			return;
 			break;
 	}
@@ -163,7 +163,7 @@ ZEND_METHOD(ArchiveWriter, __construct)
 			break;
 		default:
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Unsupported archive format: %d", format);
-            zend_restore_error_handling(&error_handling TSRMLS_CC);
+			zend_restore_error_handling(&error_handling TSRMLS_CC);
 			return;
 			break;
 	}
@@ -172,7 +172,7 @@ ZEND_METHOD(ArchiveWriter, __construct)
 	result = archive_write_open(arch->arch, arch, _archive_open_clbk, _archive_write_clbk, _archive_close_clbk);
 	/* do not pad the last block */
 	archive_write_set_bytes_in_last_block(arch->arch, 1);
-	
+
 	if (result) {
 		error_num = archive_errno(arch->arch);
 		error_string = archive_error_string(arch->arch);
@@ -184,15 +184,15 @@ ZEND_METHOD(ArchiveWriter, __construct)
 		}
 		else {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to open file %s for writing: unknown error %d", filename, result);
-		}	
-        zend_restore_error_handling(&error_handling TSRMLS_CC);
+		}
+		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
 
 	resource_id = zend_list_insert(arch,le_archive);
 	add_property_resource(this, "fd", resource_id);
-	
-    zend_restore_error_handling(&error_handling TSRMLS_CC);
+
+	zend_restore_error_handling(&error_handling TSRMLS_CC);
 	return;
 }
 /* }}} */
@@ -209,31 +209,31 @@ ZEND_METHOD(ArchiveWriter, addEntry)
 	char *pathname;
 	int pathname_len;
 	const struct stat *stat_sb;
-    zend_error_handling error_handling;
-	
-    zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC);
+	zend_error_handling error_handling;
+
+	zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC);
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "o", &entry_obj) == FAILURE) {
-        zend_restore_error_handling(&error_handling TSRMLS_CC);
+		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
-	
+
 	if (!_archive_get_fd(this, &arch TSRMLS_CC)) {
-        zend_restore_error_handling(&error_handling TSRMLS_CC);
+		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
-	
+
 	if (!instanceof_function(Z_OBJCE_P(entry_obj), ce_ArchiveEntry TSRMLS_CC)) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "An instance of ArchiveEntry is required");
-        zend_restore_error_handling(&error_handling TSRMLS_CC);
+		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
-	
-	if(!_archive_get_entry_struct(entry_obj, &entry TSRMLS_CC)) {
-        zend_restore_error_handling(&error_handling TSRMLS_CC);
+
+	if (!_archive_get_entry_struct(entry_obj, &entry TSRMLS_CC)) {
+		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
-	
+
 	pathname = entry->filename;
 	pathname_len = strlen(pathname);
 
@@ -241,7 +241,7 @@ ZEND_METHOD(ArchiveWriter, addEntry)
 
 	if (pathname_len == 0 || pathname[0] == '\0') {
 		/* user is probably trying to add "./", "/", ".." or ".", ignoring it silently */
-        zend_restore_error_handling(&error_handling TSRMLS_CC);
+		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		RETURN_TRUE;
 	}
 
@@ -261,7 +261,7 @@ ZEND_METHOD(ArchiveWriter, addEntry)
 
 	/* ..and add it to the hash */
 	zend_hash_update(arch->entries, pathname, pathname_len + 1, &entry_copy, sizeof(archive_entry_t), NULL);
-    zend_restore_error_handling(&error_handling TSRMLS_CC);
+	zend_restore_error_handling(&error_handling TSRMLS_CC);
 	RETURN_TRUE;
 }
 /* }}} */
@@ -269,7 +269,7 @@ ZEND_METHOD(ArchiveWriter, addEntry)
 /* ArchiveWriter::finish {{{
  *
 */
-ZEND_METHOD(ArchiveWriter, finish) 
+ZEND_METHOD(ArchiveWriter, finish)
 {
 	zval *this = getThis();
 	int resource_id;
@@ -280,43 +280,43 @@ ZEND_METHOD(ArchiveWriter, finish)
 	const char *error_string;
 	mode_t mode;
 	php_stream *stream;
-    zend_error_handling error_handling;
-	
-    zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC);
+	zend_error_handling error_handling;
+
+	zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC);
 
 	if (!_archive_get_fd(this, &arch TSRMLS_CC)) {
-        zend_restore_error_handling(&error_handling TSRMLS_CC);
+		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
 
-    if (zend_hash_sort(arch->entries, zend_qsort, _archive_pathname_compare, 0 TSRMLS_CC) == FAILURE) {
-        RETURN_FALSE;
-    }
+	if (zend_hash_sort(arch->entries, zend_qsort, _archive_pathname_compare, 0 TSRMLS_CC) == FAILURE) {
+		RETURN_FALSE;
+	}
 
 	zend_hash_internal_pointer_reset_ex(arch->entries, &pos);
 	while (zend_hash_get_current_data_ex(arch->entries, (void **)&entry, &pos) == SUCCESS) {
 
 		mode = archive_entry_mode((*entry)->entry);
 
-		if(S_ISREG(mode) && archive_entry_size((*entry)->entry) > 0) {
+		if (S_ISREG(mode) && archive_entry_size((*entry)->entry) > 0) {
 			if ((stream = php_stream_open_wrapper_ex((*entry)->filename, "r", ENFORCE_SAFE_MODE | REPORT_ERRORS, NULL, NULL))) {
 				char buf[PHP_ARCHIVE_BUF_LEN];
 				int header_written=0;
 				int read_bytes;
-				
+
 				while ((read_bytes = php_stream_read(stream, buf, PHP_ARCHIVE_BUF_LEN))) {
 					if (!header_written) {
 						/* write header only after the first successful read */
 						result = archive_write_header(arch->arch, (*entry)->entry);
 						if (result == ARCHIVE_FATAL) {
 							php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to write entry header for file %s: fatal error", (*entry)->filename);
-                            zend_restore_error_handling(&error_handling TSRMLS_CC);
+							zend_restore_error_handling(&error_handling TSRMLS_CC);
 							return;
 						}
 						header_written = 1;
 					}
 					result = archive_write_data(arch->arch, buf, read_bytes);
-					
+
 					if (result <= 0) {
 						error_num = archive_errno(arch->arch);
 						error_string = archive_error_string(arch->arch);
@@ -328,7 +328,7 @@ ZEND_METHOD(ArchiveWriter, finish)
 							php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to write file %s: unknown error %d", (*entry)->filename, result);
 						}
 						php_stream_close(stream);
-                        zend_restore_error_handling(&error_handling TSRMLS_CC);
+						zend_restore_error_handling(&error_handling TSRMLS_CC);
 						return;
 					}
 				}
@@ -339,7 +339,7 @@ ZEND_METHOD(ArchiveWriter, finish)
 			result = archive_write_header(arch->arch, (*entry)->entry);
 			if (result == ARCHIVE_FATAL) {
 				php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to write entry header for file %s: fatal error", (*entry)->filename);
-                zend_restore_error_handling(&error_handling TSRMLS_CC);
+				zend_restore_error_handling(&error_handling TSRMLS_CC);
 				return;
 			}
 		}
@@ -349,12 +349,12 @@ ZEND_METHOD(ArchiveWriter, finish)
 	if ((resource_id = _archive_get_rsrc_id(this TSRMLS_CC))) {
 		add_property_resource(this, "fd", 0);
 		zend_list_delete(resource_id);
-        zend_restore_error_handling(&error_handling TSRMLS_CC);
+		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		RETURN_TRUE;
 	}
-	
+
 	php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to finish writing of archive file");
-    zend_restore_error_handling(&error_handling TSRMLS_CC);
+	zend_restore_error_handling(&error_handling TSRMLS_CC);
 }
 /* }}} */
 

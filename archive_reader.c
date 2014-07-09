@@ -67,14 +67,14 @@ zend_function_entry funcs_ArchiveReader[] = {
 PHP_MINIT_FUNCTION(archive_reader)
 {
 	zend_class_entry tmp_ce_ArchiveReader, tmp_ce_ArchiveReaderInterface;
-	
+
 	INIT_CLASS_ENTRY(tmp_ce_ArchiveReaderInterface, "ArchiveReaderInterface", funcs_ArchiveReaderInterface);
 	ce_ArchiveReaderInterface = zend_register_internal_class(&tmp_ce_ArchiveReaderInterface TSRMLS_CC);
 	ce_ArchiveReaderInterface->ce_flags = ZEND_ACC_INTERFACE;
-	
+
 	INIT_CLASS_ENTRY(tmp_ce_ArchiveReader, "ArchiveReader", funcs_ArchiveReader);
 	ce_ArchiveReader = zend_register_internal_class(&tmp_ce_ArchiveReader TSRMLS_CC);
-	
+
 	zend_class_implements(ce_ArchiveReader TSRMLS_CC, 1, ce_ArchiveReaderInterface);
 
 	return SUCCESS;
@@ -84,7 +84,7 @@ PHP_MINIT_FUNCTION(archive_reader)
 /* ArchiveReader::__construct {{{
  *
 */
-ZEND_METHOD(ArchiveReader, __construct) 
+ZEND_METHOD(ArchiveReader, __construct)
 {
 	archive_file_t *arch = NULL;
 	int resource_id;
@@ -92,32 +92,32 @@ ZEND_METHOD(ArchiveReader, __construct)
 	const char *error_string = NULL;
 	char *filename;
 	long error_num, filename_len, result, format = 0, compression = 0, block_size = 0;
-    zend_error_handling error_handling;
-	
-    zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC);
-	
+	zend_error_handling error_handling;
+
+	zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC);
+
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|lll", &filename, &filename_len, &format, &compression, &block_size) == FAILURE) {
-        zend_restore_error_handling(&error_handling TSRMLS_CC);
+		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
 #if PHP_API_VERSION < 20100412
 	if (PG(safe_mode) && (!php_checkuid(filename, NULL, CHECKUID_CHECK_FILE_AND_DIR))) {
-        zend_restore_error_handling(&error_handling TSRMLS_CC);
+		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
 #endif
-	
+
 	if (php_check_open_basedir(filename TSRMLS_CC)) {
-        zend_restore_error_handling(&error_handling TSRMLS_CC);
+		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
-    
-    if(block_size <= 0){
-        block_size = PHP_ARCHIVE_BUF_LEN; 
-    }
+
+	if (block_size <= 0) {
+		block_size = PHP_ARCHIVE_BUF_LEN;
+	}
 
 	arch = (archive_file_t *) emalloc(sizeof(archive_file_t));
-	
+
 	arch->stream = NULL;
 	arch->current_entry = NULL;
 	arch->entries = NULL;
@@ -125,52 +125,52 @@ ZEND_METHOD(ArchiveReader, __construct)
 	arch->block_size = block_size;
 	arch->mode = PHP_ARCHIVE_READ_MODE;
 	arch->buf = emalloc(arch->block_size + 1);
-	arch->filename = estrndup(filename, filename_len);	
+	arch->filename = estrndup(filename, filename_len);
 	arch->arch = archive_read_new();
 
 
-    archive_read_support_filter_all(arch->arch);
-    switch(format){
-        case PHP_ARCHIVE_FORMAT_TAR:
-            archive_read_support_format_tar(arch->arch);
-            break;
-        case PHP_ARCHIVE_FORMAT_CPIO:
-            archive_read_support_format_cpio(arch->arch);
-            break;
-        default:
-            archive_read_support_format_all(arch->arch);
-            break;
-    }
+	archive_read_support_filter_all(arch->arch);
+	switch(format) {
+		case PHP_ARCHIVE_FORMAT_TAR:
+			archive_read_support_format_tar(arch->arch);
+			break;
+		case PHP_ARCHIVE_FORMAT_CPIO:
+			archive_read_support_format_cpio(arch->arch);
+			break;
+		default:
+			archive_read_support_format_all(arch->arch);
+			break;
+	}
 
-    switch(compression){
-        case PHP_ARCHIVE_COMPRESSION_NONE:
-            break;
-        case PHP_ARCHIVE_COMPRESSION_GZIP:
-            if(archive_read_support_filter_gzip(arch->arch) != ARCHIVE_OK){
+	switch(compression) {
+		case PHP_ARCHIVE_COMPRESSION_NONE:
+			break;
+		case PHP_ARCHIVE_COMPRESSION_GZIP:
+			if (archive_read_support_filter_gzip(arch->arch) != ARCHIVE_OK) {
 				efree(arch->filename);
 				efree(arch->buf);
 				efree(arch);
 				php_error_docref(NULL TSRMLS_CC, E_WARNING, "Gzip compression support is not available in this build ");
-                zend_restore_error_handling(&error_handling TSRMLS_CC);
-                return;
-            }
-            break;
-        case PHP_ARCHIVE_COMPRESSION_BZIP2:
-            if(archive_read_support_filter_gzip(arch->arch) != ARCHIVE_OK){
+				zend_restore_error_handling(&error_handling TSRMLS_CC);
+				return;
+			}
+			break;
+		case PHP_ARCHIVE_COMPRESSION_BZIP2:
+			if (archive_read_support_filter_gzip(arch->arch) != ARCHIVE_OK) {
 				efree(arch->filename);
 				efree(arch->buf);
 				efree(arch);
 				php_error_docref(NULL TSRMLS_CC, E_WARNING, "Bzip2 compression support is not available in this build ");
-                zend_restore_error_handling(&error_handling TSRMLS_CC);
+				zend_restore_error_handling(&error_handling TSRMLS_CC);
 				return;
-            }
-        default:
-            archive_read_support_filter_all(arch->arch);
-            break;
-    }
-	
+			}
+		default:
+			archive_read_support_filter_all(arch->arch);
+			break;
+	}
+
 	result = archive_read_open(arch->arch, arch, _archive_open_clbk, _archive_read_clbk, _archive_close_clbk);
-	
+
 	if (result) {
 		error_num = archive_errno(arch->arch);
 		error_string = archive_error_string(arch->arch);
@@ -185,15 +185,15 @@ ZEND_METHOD(ArchiveReader, __construct)
 		}
 		else {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to open file %s for reading: unknown error %d", filename, result);
-		}	
-        zend_restore_error_handling(&error_handling TSRMLS_CC);
+		}
+		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
 
 	resource_id = zend_list_insert(arch,le_archive);
 	add_property_resource(this, "fd", resource_id);
-	
-    zend_restore_error_handling(&error_handling TSRMLS_CC);
+
+	zend_restore_error_handling(&error_handling TSRMLS_CC);
 	return;
 }
 /* }}} */
@@ -201,7 +201,7 @@ ZEND_METHOD(ArchiveReader, __construct)
 /* ArchiveReader::getArchiveFormat{{{
  *
  * */
-ZEND_METHOD(ArchiveReader, getArchiveFormat){
+ZEND_METHOD(ArchiveReader, getArchiveFormat) {
 	long format;
 	zval *this = getThis();
 	archive_file_t *arch;
@@ -222,7 +222,7 @@ ZEND_METHOD(ArchiveReader, getArchiveFormat){
 /* ArchiveReader::getStream{{{
  *
  * */
-ZEND_METHOD(ArchiveReader, getStream){
+ZEND_METHOD(ArchiveReader, getStream) {
 	zval *this = getThis();
 	archive_file_t *arch;
     zend_error_handling error_handling;
@@ -232,9 +232,9 @@ ZEND_METHOD(ArchiveReader, getStream){
         zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
-	if(arch->stream){
+	if (arch->stream) {
 		php_stream_to_zval(arch->stream, return_value);
-	}else{
+	} else {
 		RETURN_FALSE;
 	}
 }
@@ -243,7 +243,7 @@ ZEND_METHOD(ArchiveReader, getStream){
 /* ArchiveReader::getNextEntry {{{
  *
 */
-ZEND_METHOD(ArchiveReader, getNextEntry) 
+ZEND_METHOD(ArchiveReader, getNextEntry)
 {
 	zval *this = getThis();
 	archive_file_t *arch;
@@ -256,19 +256,19 @@ ZEND_METHOD(ArchiveReader, getNextEntry)
 	off_t offset;
 	char *buf;
     zend_error_handling error_handling;
-	
+
     zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC);
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|b", &fetch_entry_data) == FAILURE) {
         zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
-	
+
 	if (!_archive_get_fd(this, &arch TSRMLS_CC)) {
         zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
-	
+
 	if (arch->struct_state == ARCHIVE_OK) {
 		result = archive_read_next_header(arch->arch, &current_entry);
 		arch->struct_state = result;
@@ -279,12 +279,11 @@ ZEND_METHOD(ArchiveReader, getNextEntry)
 		entry->resolved_filename = NULL;
 		entry->data_len = 0;
 		arch->current_entry = entry;
-	}
-	else {
+	} else {
         zend_restore_error_handling(&error_handling TSRMLS_CC);
 		RETURN_FALSE;
 	}
-	
+
 	if (result && result != ARCHIVE_EOF) {
 		arch->current_entry = NULL;
 		error_num = archive_errno(arch->arch);
@@ -293,48 +292,47 @@ ZEND_METHOD(ArchiveReader, getNextEntry)
 
 		if (error_num && error_string) {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to read file %s: error #%d, %s", arch->filename, error_num, error_string);
-		}
-		else {
+		} else {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to read file %s: unknown error %d", arch->filename, result);
-		}	
+		}
         zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
-	
+
 	if (result == ARCHIVE_EOF) {
 		arch->current_entry = NULL;
 		efree(entry);
         zend_restore_error_handling(&error_handling TSRMLS_CC);
 		RETURN_FALSE;
 	}
-	
+
 	object_init_ex(return_value, ce_ArchiveEntry);
-	
+
 	if (fetch_entry_data) {
 		while ((result = archive_read_data_block(arch->arch, (const void **)&buf, &len, &offset)) == ARCHIVE_OK) {
 			entry->data = erealloc(entry->data, entry->data_len + len + 1);
 			memcpy(entry->data + entry->data_len, buf, len);
 			entry->data_len += len;
 		}
-		
+
 		if (result && result != ARCHIVE_EOF) {
 			error_num = archive_errno(arch->arch);
 			error_string = archive_error_string(arch->arch);
 			efree(entry);
-			
+
 			if (error_num && error_string) {
 				php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to read file %s: error #%d, %s", arch->filename, error_num, error_string);
 			}
 			else {
 				php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to read file %s: unknown error %d", arch->filename, result);
-			}	
+			}
             zend_restore_error_handling(&error_handling TSRMLS_CC);
 			return;
-		}	
+		}
 	}
 
 	if (entry->entry) {
-		resource_id = zend_list_insert(entry,le_archive_entry);	
+		resource_id = zend_list_insert(entry,le_archive_entry);
 		add_property_resource(return_value, "entry", resource_id);
 	}
 
@@ -345,7 +343,7 @@ ZEND_METHOD(ArchiveReader, getNextEntry)
 /* ArchiveReader::readCurrentEntryData(count) {{{
  *
 */
-ZEND_METHOD(ArchiveReader, readCurrentEntryData){
+ZEND_METHOD(ArchiveReader, readCurrentEntryData) {
 	zval *this = getThis();
 	archive_file_t *arch;
 	char *buf, *error_string;
@@ -372,16 +370,16 @@ ZEND_METHOD(ArchiveReader, readCurrentEntryData){
 	}
 	Z_STRVAL_P(return_value) = emalloc(count+1);
 	len = 0;
-	while(count > 0){
+	while(count > 0) {
 		r = archive_read_data(arch->arch, Z_STRVAL_P(return_value)+len, count);
-		if(r < ARCHIVE_OK){
+		if (r < ARCHIVE_OK) {
 			error_num = archive_errno(arch->arch);
 			error_string = archive_error_string(arch->arch);
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Decompress entry failed errno(%d):%s", error_num, error_string);
 			zend_restore_error_handling(&error_handling TSRMLS_CC);
 			return;
 		}
-		if(r == 0){
+		if (r == 0) {
 			break;
 		}
 		count -= r;
@@ -397,7 +395,7 @@ ZEND_METHOD(ArchiveReader, readCurrentEntryData){
 /* ArchiveReader::getCurrentEntryData {{{
  *
 */
-ZEND_METHOD(ArchiveReader, getCurrentEntryData) 
+ZEND_METHOD(ArchiveReader, getCurrentEntryData)
 {
 	zval *this = getThis();
 	archive_file_t *arch;
@@ -407,7 +405,7 @@ ZEND_METHOD(ArchiveReader, getCurrentEntryData)
 	const char *error_string;
 	char *buf;
     zend_error_handling error_handling;
-	
+
     zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC);
 
 	if (!_archive_get_fd(this, &arch TSRMLS_CC)) {
@@ -420,32 +418,31 @@ ZEND_METHOD(ArchiveReader, getCurrentEntryData)
         zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
-	
+
 	if (arch->current_entry->data) {
         zend_restore_error_handling(&error_handling TSRMLS_CC);
 		RETURN_STRINGL(arch->current_entry->data, arch->current_entry->data_len, 1);
 	}
-	
+
 	while ((result = archive_read_data_block(arch->arch, (const void **)&buf, &len, &offset)) == ARCHIVE_OK) {
 		arch->current_entry->data = erealloc(arch->current_entry->data, arch->current_entry->data_len + len + 1);
 		memcpy(arch->current_entry->data + arch->current_entry->data_len, buf, len);
 		arch->current_entry->data_len += len;
 	}
-	
+
 	if (result && result != ARCHIVE_EOF) {
 		error_num = archive_errno(arch->arch);
 		error_string = archive_error_string(arch->arch);
-		
+
 		if (error_num && error_string) {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to read entry data: error #%d, %s", error_num, error_string);
-		}
-		else {
+		} else {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to read entry data: unknown error %d", result);
 		}
         zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
-	
+
     zend_restore_error_handling(&error_handling TSRMLS_CC);
 	RETURN_STRINGL(arch->current_entry->data, arch->current_entry->data_len, 1);
 }
@@ -453,12 +450,12 @@ ZEND_METHOD(ArchiveReader, getCurrentEntryData)
 
 /* ArchiveReader::skipCurrentEntryData{{{
  * */
-ZEND_METHOD(ArchiveReader, skipCurrentEntryData){
+ZEND_METHOD(ArchiveReader, skipCurrentEntryData) {
 	zval *this = getThis();
 	archive_file_t *arch;
 	zend_error_handling error_handling;
 	int r;
-	
+
 	zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC);
 
 	if (!_archive_get_fd(this, &arch TSRMLS_CC)) {
@@ -466,7 +463,7 @@ ZEND_METHOD(ArchiveReader, skipCurrentEntryData){
 		return;
 	}
 	r = archive_read_data_skip(arch->arch);
-	if(r != ARCHIVE_OK){
+	if (r != ARCHIVE_OK) {
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Skip archive entry failed");
 		zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
@@ -477,21 +474,21 @@ ZEND_METHOD(ArchiveReader, skipCurrentEntryData){
 /* ArchiveReader::extractCurrentEntry {{{
  *
 */
-ZEND_METHOD(ArchiveReader, extractCurrentEntry) 
+ZEND_METHOD(ArchiveReader, extractCurrentEntry)
 {
 	zval *this = getThis();
 	archive_file_t *arch;
 	int result, error_num, flags = 0;
 	const char *error_string;
     zend_error_handling error_handling;
-	
+
     zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC);
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "|l", &flags) == FAILURE) {
         zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
-	
+
 	if (!_archive_get_fd(this, &arch TSRMLS_CC)) {
         zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
@@ -502,9 +499,9 @@ ZEND_METHOD(ArchiveReader, extractCurrentEntry)
         zend_restore_error_handling(&error_handling TSRMLS_CC);
 		return;
 	}
-	
+
 	if (arch->current_entry->data) {
-		/* again, rather annoying libarchive limitation: you can't extract or 
+		/* again, rather annoying libarchive limitation: you can't extract or
 		 * read entry anymore if it had been extracted/read before.
 		 * */
         zend_restore_error_handling(&error_handling TSRMLS_CC);
@@ -512,15 +509,14 @@ ZEND_METHOD(ArchiveReader, extractCurrentEntry)
 	}
 
 	result = archive_read_extract(arch->arch, arch->current_entry->entry, flags);
-	
+
 	if (result && result != ARCHIVE_EOF) {
 		error_num = archive_errno(arch->arch);
 		error_string = archive_error_string(arch->arch);
-		
+
 		if (error_num && error_string) {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to extract entry: error #%d, %s", error_num, error_string);
-		}
-		else {
+		} else {
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to extract entry: unknown error %d", result);
 		}
 
@@ -535,12 +531,12 @@ ZEND_METHOD(ArchiveReader, extractCurrentEntry)
 /* ArchiveReader::close {{{
  *
 */
-ZEND_METHOD(ArchiveReader, close) 
+ZEND_METHOD(ArchiveReader, close)
 {
 	zval *this = getThis();
 	int resourse_id;
     zend_error_handling error_handling;
-	
+
     zend_replace_error_handling(EH_THROW, ce_ArchiveException, &error_handling TSRMLS_CC);
 
 	if ((resourse_id = _archive_get_rsrc_id(this TSRMLS_CC))) {
@@ -549,7 +545,7 @@ ZEND_METHOD(ArchiveReader, close)
         zend_restore_error_handling(&error_handling TSRMLS_CC);
 		RETURN_TRUE;
 	}
-	
+
 	php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to close archive file descriptor");
     zend_restore_error_handling(&error_handling TSRMLS_CC);
 }
