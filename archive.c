@@ -90,6 +90,7 @@ static void _archive_desc_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC)
 	 archive_file_t *arch = (archive_file_t *)rsrc->ptr;
 
 	if (arch->mode == PHP_ARCHIVE_READ_MODE) {
+		archive_read_close(arch->arch);
 		archive_read_free(arch->arch);
 	}
 	else if (arch->mode == PHP_ARCHIVE_WRITE_MODE) {

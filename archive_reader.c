@@ -184,6 +184,7 @@ ZEND_METHOD(ArchiveReader, __construct)
 			php_error_docref(NULL TSRMLS_CC, E_WARNING, "Failed to open file %s for reading: unknown error %d", filename, result);
 		}	
         zend_restore_error_handling(&error_handling TSRMLS_CC);
+		archive_read_close(arch->arch);
 		archive_read_free(arch->arch);
 		efree(arch->filename);
 		efree(arch->buf);
